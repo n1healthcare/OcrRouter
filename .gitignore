@@ -1,0 +1,140 @@
+# ============================================
+# Sensitive Files (CRITICAL - Keep First)
+# ============================================
+.env
+source.dev.env
+
+# ============================================
+# Python
+# ============================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv*/
+envs/
+ENV/
+env/
+.venv
+
+# Testing / Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+pytestdebug.log
+.coveragerc
+
+# Jupyter Notebook
+*.ipynb
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# ============================================
+# IDEs and Editors
+# ============================================
+# VSCode
+.vscode/
+.history/
+
+# PyCharm / IntelliJ
+.idea/
+
+# ============================================
+# Operating System Files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+
+# ============================================
+# Project Specific
+# ============================================
+# Logs
+*.log
+slurm_logs/
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+
+# Debug
+debug/
+debug_output/
+debug_utils/
+cli_debug/
+
+# Temporary files
+temp/
+tmp/
+bak/
+bad_words/
+
+# Output directories
+output*/
+input/
+reference-only/
+
+# Test directories
+app/tests/*
+
+# Web projects
+projects/web/node_modules/
+projects/web/dist/
+projects/web_demo/web_demo/static/
+
+# Sphinx documentation
+_build/
+
+# Custom scripts
+sync1.sh
+data_preprocess_pj1
+data-preparation1
+ocr_demo
+
+# Custom exclusions
+/app/common/__init__.py
+/magic_pdf/config/__init__.py
+
+# Obsidian
+.obsidian/
+.claude
