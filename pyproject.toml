@@ -5,9 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ocrrouter"
 dynamic = ["version"]
-license = { text = "AGPL-3.0" }
+authors = [
+    {name = "Tan Jun An", email = "jun.an@n1.healthcare"}
+]
+license = "AGPL-3.0"
 description = "A practical tool for converting PDF to Markdown"
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10,<3.14"
 keywords = ["magic-pdf", "convert", "pdf", "markdown", "ocr", "router"]
 classifiers = [
@@ -47,6 +50,12 @@ version = { attr = "ocrrouter.version.__version__" }
 [tool.setuptools.packages.find]
 include = ["ocrrouter*"]
 namespaces = false
+
+[project.urls]
+Homepage = "https://github.com/n1healthcare/OcrRouter"
+Repository = "https://github.com/n1healthcare/OcrRouter"
+Issues = "https://github.com/n1healthcare/OcrRouter/issues"
+Documentation = "https://github.com/n1healthcare/OcrRouter#readme"
 
 [tool.setuptools]
 zip-safe = false
