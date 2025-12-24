@@ -138,3 +138,4 @@ ocr_demo
 # Obsidian
 .obsidian/
 .claude
+demo/demo_local.py
