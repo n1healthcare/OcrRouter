@@ -5,8 +5,9 @@ from magika import Magika
 
 
 DEFAULT_LANG = "txt"
-PDF_SIG_BYTES = b'%PDF'
+PDF_SIG_BYTES = b"%PDF"
 magika = Magika()
+
 
 def guess_language_by_text(code):
     codebytes = code.encode(encoding="utf-8")
@@ -16,8 +17,11 @@ def guess_language_by_text(code):
 
 def guess_suffix_by_bytes(file_bytes, file_path=None) -> str:
     suffix = magika.identify_bytes(file_bytes).prediction.output.label
-    if file_path and suffix in ["ai", "html"] and Path(file_path).suffix.lower() in [".pdf"] and file_bytes[:4] == PDF_SIG_BYTES:
-        suffix = "pdf"
+    # Check for PDF signature when Magika misclassifies as ai/html
+    if suffix in ["ai", "html"] and file_bytes[:4] == PDF_SIG_BYTES:
+        # When path is provided, verify extension matches; otherwise trust signature
+        if file_path is None or Path(file_path).suffix.lower() in [".pdf"]:
+            suffix = "pdf"
     return suffix
 
 
@@ -27,9 +31,11 @@ def guess_suffix_by_path(file_path) -> str:
     suffix = magika.identify_path(file_path).prediction.output.label
     if suffix in ["ai", "html"] and file_path.suffix.lower() in [".pdf"]:
         try:
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 if f.read(4) == PDF_SIG_BYTES:
                     suffix = "pdf"
         except Exception as e:
-            logger.warning(f"Failed to read file {file_path} for PDF signature check: {e}")
+            logger.warning(
+                f"Failed to read file {file_path} for PDF signature check: {e}"
+            )
     return suffix

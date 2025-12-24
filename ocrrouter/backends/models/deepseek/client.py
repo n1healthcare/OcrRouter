@@ -191,8 +191,14 @@ class DeepSeekClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="layout-deepseek-detection"
+                    ):
+                        return await self._do_layout_detect(image, priority, semaphore)
+            else:
                 with langfuse.start_as_current_span(name="layout-deepseek-detection"):
                     return await self._do_layout_detect(image, priority, semaphore)
         else:
@@ -297,8 +303,14 @@ class DeepSeekClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):
+                        return await self._do_content_extract(
+                            image, type, priority, semaphore
+                        )
+            else:
                 with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):
                     return await self._do_content_extract(
                         image, type, priority, semaphore
@@ -421,8 +433,18 @@ class DeepSeekClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="layout-deepseek-detection"
+                    ):
+                        blocks = await self._do_two_step_layout(
+                            image, priority, semaphore
+                        )
+                    with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):
+                        return await self._do_two_step_ocr(blocks)
+            else:
                 with langfuse.start_as_current_span(name="layout-deepseek-detection"):
                     blocks = await self._do_two_step_layout(image, priority, semaphore)
                 with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):

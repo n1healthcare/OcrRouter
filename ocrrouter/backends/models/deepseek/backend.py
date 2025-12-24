@@ -10,7 +10,6 @@ from ocrrouter.preprocessor.utils.pdf_image_tools import load_images_from_pdf
 from ocrrouter.utils.enum_class import ImageType
 from ocrrouter.backends.models.base import BaseModelBackend
 from ocrrouter.backends.utils import result_to_middle_json
-from ocrrouter.observability import observe
 
 from .client import DeepSeekClient
 
@@ -49,7 +48,6 @@ class DeepSeekBackend(BaseModelBackend):
             self._client = DeepSeekClient(self._settings)
         return self._client
 
-    @observe(name="analyze-backend-deepseek", capture_input=False, capture_output=False)
     async def analyze(
         self,
         pdf_bytes: bytes,

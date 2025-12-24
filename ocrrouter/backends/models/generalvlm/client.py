@@ -184,8 +184,16 @@ class GeneralVLMClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="ocr-generalvlm-extraction"
+                    ):
+                        return await self._do_content_extract(
+                            image, type, priority, semaphore
+                        )
+            else:
                 with langfuse.start_as_current_span(name="ocr-generalvlm-extraction"):
                     return await self._do_content_extract(
                         image, type, priority, semaphore
@@ -295,8 +303,16 @@ class GeneralVLMClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="ocr-generalvlm-extraction"
+                    ):
+                        return await self._do_full_page_ocr(
+                            image, page_image, priority, semaphore
+                        )
+            else:
                 with langfuse.start_as_current_span(name="ocr-generalvlm-extraction"):
                     return await self._do_full_page_ocr(
                         image, page_image, priority, semaphore

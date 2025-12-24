@@ -171,8 +171,12 @@ class MinerUClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(name="layout-mineru-detection"):
+                        return await self._do_layout_detect(image, priority, semaphore)
+            else:
                 with langfuse.start_as_current_span(name="layout-mineru-detection"):
                     return await self._do_layout_detect(image, priority, semaphore)
         else:
@@ -272,8 +276,14 @@ class MinerUClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
+                        return await self._do_content_extract(
+                            image, type, priority, semaphore
+                        )
+            else:
                 with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
                     return await self._do_content_extract(
                         image, type, priority, semaphore
@@ -374,8 +384,18 @@ class MinerUClient:
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(name="layout-mineru-detection"):
+                        blocks = await self._do_layout_detect(
+                            image, priority, semaphore
+                        )
+                    with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
+                        return await self._do_two_step_ocr(
+                            image, blocks, priority, semaphore
+                        )
+            else:
                 with langfuse.start_as_current_span(name="layout-mineru-detection"):
                     blocks = await self._do_layout_detect(image, priority, semaphore)
                 with langfuse.start_as_current_span(name="ocr-mineru-extraction"):

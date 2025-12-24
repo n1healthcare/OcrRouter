@@ -17,31 +17,34 @@ class InputHandler:
         self.pdf_suffixes = PDF_SUFFIXES
         self.image_suffixes = IMAGE_SUFFIXES
 
-    def read(self, path: str | Path) -> bytes:
-        """Read a file and return its bytes.
+    def read(self, input_data: str | Path | bytes) -> bytes:
+        """Read input and return PDF bytes.
 
-        If the file is an image, it will be converted to PDF bytes.
+        If the input is an image, it will be converted to PDF bytes.
+        Uses Google Magika to detect file type from byte content.
 
         Args:
-            path: Path to the file to read.
+            input_data: File path (str or Path) or raw file bytes (PDF or image).
 
         Returns:
             PDF bytes (either original PDF or converted from image).
 
         Raises:
-            FileNotFoundError: If the file does not exist.
+            FileNotFoundError: If a path is provided and file does not exist.
             ValueError: If the file type is not supported.
         """
-        if not isinstance(path, Path):
-            path = Path(path)
-
-        if not path.exists():
-            raise FileNotFoundError(f"File not found: {path}")
-
-        with open(str(path), "rb") as input_file:
-            file_bytes = input_file.read()
-
-        file_suffix = guess_suffix_by_bytes(file_bytes, path)
+        # Handle bytes input directly
+        if isinstance(input_data, bytes):
+            file_bytes = input_data
+            file_suffix = guess_suffix_by_bytes(file_bytes)
+        else:
+            # Handle path input
+            path = Path(input_data) if not isinstance(input_data, Path) else input_data
+            if not path.exists():
+                raise FileNotFoundError(f"File not found: {path}")
+            with open(str(path), "rb") as f:
+                file_bytes = f.read()
+            file_suffix = guess_suffix_by_bytes(file_bytes, path)
 
         if file_suffix in self.image_suffixes:
             return images_bytes_to_pdf_bytes(file_bytes)
@@ -50,43 +53,59 @@ class InputHandler:
         else:
             raise ValueError(f"Unsupported file type: {file_suffix}")
 
-    def read_multiple(self, paths: list[str | Path]) -> list[tuple[str, bytes]]:
-        """Read multiple files.
+    def read_multiple(
+        self, inputs: list[str | Path | bytes | tuple[str, bytes]]
+    ) -> list[tuple[str, bytes]]:
+        """Read multiple inputs.
 
         Args:
-            paths: List of file paths to read.
+            inputs: List of inputs. Each can be:
+                - str or Path: File path (filename derived from path stem)
+                - bytes: Raw bytes (filename defaults to "document_N")
+                - tuple[str, bytes]: (filename, raw_bytes)
 
         Returns:
             List of tuples (file_name, pdf_bytes).
         """
         results = []
-        for path in paths:
-            if not isinstance(path, Path):
-                path = Path(path)
-            file_name = str(path.stem)
-            pdf_bytes = self.read(path)
+        for i, input_data in enumerate(inputs):
+            if isinstance(input_data, tuple):
+                file_name, file_bytes = input_data
+                pdf_bytes = self.read(file_bytes)
+            elif isinstance(input_data, bytes):
+                file_name = f"document_{i}"
+                pdf_bytes = self.read(input_data)
+            else:
+                path = (
+                    Path(input_data) if not isinstance(input_data, Path) else input_data
+                )
+                file_name = path.stem
+                pdf_bytes = self.read(path)
             results.append((file_name, pdf_bytes))
         return results
 
-    def is_supported_file(self, path: str | Path) -> bool:
-        """Check if a file type is supported.
+    def is_supported(self, input_data: str | Path | bytes) -> bool:
+        """Check if input type is supported.
 
         Args:
-            path: Path to check.
+            input_data: File path (str or Path) or raw bytes to check.
 
         Returns:
-            True if the file type is supported, False otherwise.
+            True if the input type is supported, False otherwise.
         """
-        if not isinstance(path, Path):
-            path = Path(path)
-
-        if not path.exists():
-            return False
-
         try:
-            with open(str(path), "rb") as f:
-                file_bytes = f.read()
-            file_suffix = guess_suffix_by_bytes(file_bytes, path)
+            if isinstance(input_data, bytes):
+                file_bytes = input_data
+                file_suffix = guess_suffix_by_bytes(file_bytes)
+            else:
+                path = (
+                    Path(input_data) if not isinstance(input_data, Path) else input_data
+                )
+                if not path.exists():
+                    return False
+                with open(str(path), "rb") as f:
+                    file_bytes = f.read()
+                file_suffix = guess_suffix_by_bytes(file_bytes, path)
             return file_suffix in (self.pdf_suffixes + self.image_suffixes)
         except Exception:
             return False

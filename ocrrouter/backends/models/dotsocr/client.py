@@ -208,8 +208,14 @@ class DotsOCRClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="layout-dotsocr-detection"
+                    ):
+                        return await self._do_layout_detect(image, priority, semaphore)
+            else:
                 with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
                     return await self._do_layout_detect(image, priority, semaphore)
         else:
@@ -308,8 +314,14 @@ class DotsOCRClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(name="ocr-dotsocr-extraction"):
+                        return await self._do_content_extract(
+                            image, type, priority, semaphore
+                        )
+            else:
                 with langfuse.start_as_current_span(name="ocr-dotsocr-extraction"):
                     return await self._do_content_extract(
                         image, type, priority, semaphore
@@ -430,9 +442,18 @@ class DotsOCRClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                return await self._do_one_step_extract(image, priority, semaphore)
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="layout-dotsocr-detection"
+                    ):
+                        return await self._do_one_step_extract(
+                            image, priority, semaphore
+                        )
+            else:
+                with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
+                    return await self._do_one_step_extract(image, priority, semaphore)
         else:
             return await self._do_one_step_extract(image, priority, semaphore)
 
@@ -559,8 +580,60 @@ class DotsOCRClient:
         """
         langfuse = get_langfuse_client()
 
-        if langfuse and page_idx is not None:
-            with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+        if langfuse:
+            if page_idx is not None:
+                with langfuse.start_as_current_span(name=f"page-{page_idx}"):
+                    with langfuse.start_as_current_span(
+                        name="layout-dotsocr-detection"
+                    ):
+                        blocks = await self._do_layout_detect(
+                            image,
+                            priority,
+                            semaphore or asyncio.Semaphore(self.max_concurrency),
+                        )
+
+                    if not blocks:
+                        return blocks
+
+                    with langfuse.start_as_current_span(name="ocr-dotsocr-extraction"):
+                        # Extract content for each block
+                        image = get_rgb_image(image)
+                        width, height = image.size
+                        semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
+
+                        block_images: list[Image.Image] = []
+                        block_indices: list[int] = []
+
+                        for idx, block in enumerate(blocks):
+                            if block.type == "image":
+                                continue
+                            x1, y1, x2, y2 = block.bbox
+                            crop_box = (
+                                int(x1 * width),
+                                int(y1 * height),
+                                int(x2 * width),
+                                int(y2 * height),
+                            )
+                            block_images.append(image.crop(crop_box))
+                            block_indices.append(idx)
+
+                        if block_images:
+                            contents = await gather_tasks(
+                                tasks=[
+                                    self._do_content_extract(
+                                        img, "text", priority, semaphore
+                                    )
+                                    for img in block_images
+                                ],
+                                use_tqdm=False,
+                            )
+                            for idx, content in zip(block_indices, contents):
+                                blocks[idx].content = content
+
+                        return await self.postprocessor.aio_post_process_blocks(
+                            self.executor, blocks
+                        )
+            else:
                 with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
                     blocks = await self._do_layout_detect(
                         image,
