@@ -216,9 +216,12 @@ class PaddleOCRClient:
 
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
 
+        total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(img, t, p, semaphore, page_idx=idx)
+                self.aio_content_extract(
+                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
+                )
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -322,9 +325,16 @@ class PaddleOCRClient:
 
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
 
+        total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_full_page_ocr(img, page_img, p, semaphore, page_idx=idx)
+                self.aio_full_page_ocr(
+                    img,
+                    page_img,
+                    p,
+                    semaphore,
+                    page_idx=idx if total_pages > 1 else None,
+                )
                 for idx, (img, page_img, p) in enumerate(
                     zip(images, page_images, priority)
                 )

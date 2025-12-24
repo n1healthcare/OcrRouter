@@ -41,9 +41,8 @@ class CompositeClient:
         self,
         settings: Settings,
         layout_model: Literal["mineru", "deepseek", "dotsocr"] | None = None,
-        ocr_model: Literal[
-            "mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm"
-        ] | None = None,
+        ocr_model: Literal["mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm"]
+        | None = None,
         executor: Executor | None = None,
         use_tqdm: bool = True,
     ) -> None:
@@ -59,7 +58,9 @@ class CompositeClient:
         self._settings = settings
 
         # Use settings values if not explicitly provided
-        layout_model = layout_model if layout_model is not None else settings.layout_model
+        layout_model = (
+            layout_model if layout_model is not None else settings.layout_model
+        )
         ocr_model = ocr_model if ocr_model is not None else settings.ocr_model
 
         self.layout_model = layout_model
@@ -414,9 +415,12 @@ class CompositeClient:
 
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
 
+        total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_two_step_extract(img, p, semaphore, page_idx=idx)
+                self.aio_two_step_extract(
+                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
+                )
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,

@@ -219,9 +219,12 @@ class DeepSeekClient:
 
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
 
+        total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_layout_detect(img, p, semaphore, page_idx=idx)
+                self.aio_layout_detect(
+                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
+                )
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -328,9 +331,12 @@ class DeepSeekClient:
 
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
 
+        total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(img, t, p, semaphore, page_idx=idx)
+                self.aio_content_extract(
+                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
+                )
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -446,9 +452,12 @@ class DeepSeekClient:
 
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
 
+        total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_two_step_extract(img, p, semaphore, page_idx=idx)
+                self.aio_two_step_extract(
+                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
+                )
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
