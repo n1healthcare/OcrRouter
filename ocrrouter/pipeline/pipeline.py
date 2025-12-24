@@ -11,8 +11,6 @@ from ocrrouter.backends import get_backend
 from ocrrouter.utils.io.writers import FileBasedDataWriter
 from ocrrouter.utils.run_async import run_async
 from ocrrouter.observability import (
-    generate_session_id,
-    get_langfuse_client,
     observe,
     set_langfuse_client,
 )
@@ -108,14 +106,12 @@ class DocumentPipeline:
             self._backend = get_backend(self._settings.backend, settings=self._settings)
         return self._backend
 
-    @observe(name="process-document", capture_input=False, capture_output=False)
     async def aio_process(
         self,
         input_path: str | Path,
         output_dir: str,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
-        session_id: str | None = None,
         **options: Any,
     ) -> dict:
         """Process a document asynchronously.
@@ -125,7 +121,6 @@ class DocumentPipeline:
             output_dir: Directory to write output files.
             start_page_id: Starting page index (0-based).
             end_page_id: Ending page index (0-based).
-            session_id: Optional session ID for grouping traces in batch processing.
             **options: Additional processing options.
 
         Returns:
@@ -137,23 +132,6 @@ class DocumentPipeline:
             input_path = Path(input_path)
         pdf_file_name = input_path.stem
         pdf_bytes = self.input_handler.read(input_path)
-
-        # Update trace metadata if Langfuse is configured
-        langfuse = get_langfuse_client()
-        if langfuse is not None:
-            # Generate session_id if not provided
-            if session_id is None:
-                session_id = generate_session_id(name=pdf_file_name)
-
-            langfuse.update_current_trace(
-                name=f"document-{pdf_file_name}",
-                session_id=session_id,
-                tags=["ocrrouter", self._settings.backend],
-                metadata={
-                    "backend": self._settings.backend,
-                    "document_name": pdf_file_name,
-                },
-            )
 
         # Step 2: Preprocess (page selection)
         logger.debug("Preprocessing document...")
@@ -247,7 +225,6 @@ class DocumentPipeline:
         output_dir: str,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
-        session_id: str | None = None,
         **options: Any,
     ) -> list[dict]:
         """Process multiple documents asynchronously.
@@ -257,21 +234,12 @@ class DocumentPipeline:
             output_dir: Directory to write output files.
             start_page_id: Starting page index (0-based).
             end_page_id: Ending page index (0-based).
-            session_id: Optional session ID for grouping all documents in this batch.
             **options: Additional processing options.
 
         Returns:
             List of dictionaries containing processing results.
         """
-        # Generate shared session_id for batch if Langfuse is configured
-        langfuse = get_langfuse_client()
-        if langfuse is not None and session_id is None:
-            session_id = generate_session_id(name="batch", prefix="mineru-batch")
-
-        logger.info(
-            f"Processing batch of {len(input_paths)} documents"
-            + (f" with session_id: {session_id}" if session_id else "")
-        )
+        logger.info(f"Processing batch of {len(input_paths)} documents")
 
         results = []
         for input_path in input_paths:
@@ -280,7 +248,6 @@ class DocumentPipeline:
                 output_dir,
                 start_page_id=start_page_id,
                 end_page_id=end_page_id,
-                session_id=session_id,  # Pass shared session_id
                 **options,
             )
             results.append(result)

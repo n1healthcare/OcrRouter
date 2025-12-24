@@ -52,8 +52,8 @@ async def compare_composite_configurations(pdf_path: str, output_base: str):
 
     config1 = Settings(
         backend="composite",
-        layout_model="mineru",      # Best layout detection
-        ocr_model="paddleocr",      # Fast OCR
+        layout_model="mineru",  # Best layout detection
+        ocr_model="paddleocr",  # Fast OCR
         openai_base_url=openai_base_url,
         openai_api_key=openai_api_key,
         formula_enable=True,
@@ -70,8 +70,8 @@ async def compare_composite_configurations(pdf_path: str, output_base: str):
 
     config2 = Settings(
         backend="composite",
-        layout_model="deepseek",    # Fast layout
-        ocr_model="deepseek",       # Fast OCR
+        layout_model="deepseek",  # Fast layout
+        ocr_model="deepseek",  # Fast OCR
         openai_base_url=openai_base_url,
         openai_api_key=openai_api_key,
     )
@@ -86,8 +86,8 @@ async def compare_composite_configurations(pdf_path: str, output_base: str):
 
     config3 = Settings(
         backend="composite",
-        layout_model="dotsocr",     # Fast layout
-        ocr_model="generalvlm",     # Use premium VLM
+        layout_model="dotsocr",  # Fast layout
+        ocr_model="generalvlm",  # Use premium VLM
         generalvlm_model_name="gemini-2.5-pro",  # Change to your model
         openai_base_url=openai_base_url,
         openai_api_key=openai_api_key,
@@ -116,31 +116,34 @@ async def compare_composite_configurations(pdf_path: str, output_base: str):
             result = await pipeline.aio_process(
                 pdf_path,
                 f"{output_base}/{name}",
-                session_id=f"composite-demo-{name}"
             )
 
             duration = (datetime.now() - start_time).total_seconds()
 
-            results.append({
-                "name": name,
-                "config": config,
-                "result": result,
-                "duration": duration,
-                "success": True
-            })
+            results.append(
+                {
+                    "name": name,
+                    "config": config,
+                    "result": result,
+                    "duration": duration,
+                    "success": True,
+                }
+            )
 
             print(f"  ✓ Completed in {duration:.1f}s")
 
         except Exception as e:
             print(f"  ✗ Failed: {e}")
-            results.append({
-                "name": name,
-                "config": config,
-                "result": None,
-                "duration": 0,
-                "success": False,
-                "error": str(e)
-            })
+            results.append(
+                {
+                    "name": name,
+                    "config": config,
+                    "result": None,
+                    "duration": 0,
+                    "success": False,
+                    "error": str(e),
+                }
+            )
 
     # ========== Compare Results ==========
 
@@ -157,7 +160,7 @@ async def compare_composite_configurations(pdf_path: str, output_base: str):
             print(f"  Blocks: {len(r['result'].get('content_list', []))}")
 
             # Show markdown preview
-            markdown = r['result']['markdown']
+            markdown = r["result"]["markdown"]
             print(f"  Markdown preview (first 200 chars):")
             print(f"    {markdown[:200].replace(chr(10), ' ')}...")
         else:
@@ -223,8 +226,8 @@ def simple_composite_example():
     # Create composite pipeline
     settings = Settings(
         backend="composite",
-        layout_model="mineru",      # Best layout detection
-        ocr_model="paddleocr",      # Fast OCR
+        layout_model="mineru",  # Best layout detection
+        ocr_model="paddleocr",  # Fast OCR
         openai_base_url=openai_base_url,
         openai_api_key=openai_api_key,
     )

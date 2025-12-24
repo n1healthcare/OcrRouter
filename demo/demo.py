@@ -124,9 +124,7 @@ async def parse_documents(
         async with semaphore:
             try:
                 logger.info(f"Processing: {path}")
-                result = await pipeline.aio_process(
-                    str(path), output_dir, session_id=session_id
-                )
+                result = await pipeline.aio_process(str(path), output_dir)
                 logger.info(
                     f"Completed: {path} -> {result.get('output_dir', output_dir)}"
                 )
