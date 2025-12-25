@@ -193,6 +193,12 @@ class Settings(BaseModel):
         description="Logging level (DEBUG, INFO, WARNING, ERROR)",
     )
 
+    # ============ Progress Display ============
+    use_tqdm: bool = Field(
+        default=True,
+        description="Show progress bars during processing",
+    )
+
     # ============ Debug Settings ============
     debug: bool = Field(
         default=False,

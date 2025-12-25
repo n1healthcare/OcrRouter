@@ -1,6 +1,7 @@
 """Main document processing pipeline."""
 
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +30,12 @@ class DocumentPipeline:
     Example:
         >>> from ocrrouter import DocumentPipeline, Settings
         >>>
-        >>> # Simple usage with constructor arguments
+        >>> # Development: just get the result (uses temp directory)
+        >>> pipeline = DocumentPipeline(backend="deepseek")
+        >>> result = pipeline.process("document.pdf")
+        >>> print(result["markdown"])
+        >>>
+        >>> # Production: persist to disk
         >>> pipeline = DocumentPipeline(
         ...     backend="deepseek",
         ...     openai_base_url="https://api.example.com",
@@ -40,6 +46,7 @@ class DocumentPipeline:
         >>> # Process from bytes (e.g., from API upload)
         >>> with open("document.pdf", "rb") as f:
         ...     pdf_bytes = f.read()
+        >>> result = pipeline.process(pdf_bytes, filename="document")  # temp dir
         >>> result = pipeline.process(pdf_bytes, "output/", filename="document")
         >>>
         >>> # With Langfuse observability (parent app owns the client)
@@ -111,7 +118,7 @@ class DocumentPipeline:
     async def aio_process(
         self,
         input_data: str | Path | bytes,
-        output_dir: str,
+        output_dir: str | None = None,
         filename: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
@@ -123,7 +130,9 @@ class DocumentPipeline:
             input_data: Input source - can be:
                 - str or Path: Path to the input file (PDF or image)
                 - bytes: Raw file bytes (PDF or image, detected via Magika)
-            output_dir: Directory to write output files.
+            output_dir: Directory to write output files. If None, a temporary
+                directory is used and only images are saved (for downstream use).
+                Other output files (markdown, JSON, etc.) are skipped.
             filename: Name for the output file (without extension).
                 Required when input_data is bytes, optional for paths
                 (defaults to path stem).
@@ -137,6 +146,14 @@ class DocumentPipeline:
         Raises:
             ValueError: If input_data is bytes and filename is not provided.
         """
+        # Track if user provided output_dir (affects file writing behavior)
+        user_provided_output = output_dir is not None
+
+        # Use temp directory if output_dir not provided
+        if output_dir is None:
+            output_dir = tempfile.mkdtemp(prefix="ocrrouter_")
+            logger.debug(f"Using temporary output directory: {output_dir}")
+
         # Step 1: Read input
         if isinstance(input_data, bytes):
             if filename is None:
@@ -183,18 +200,21 @@ class DocumentPipeline:
             **options,
         )
 
-        # Step 6: Write output
-        logger.debug("Writing output...")
-        self.output_handler.write(
-            pdf_file_name=pdf_file_name,
-            pdf_bytes=prepared_pdf,
-            middle_json=middle_json,
-            formatted_output=formatted_output,
-            output_dir=local_md_dir,
-            local_image_dir=local_image_dir,
-            model_output=model_output,
-            **options,
-        )
+        # Step 6: Write output (only if user provided output_dir)
+        if user_provided_output:
+            logger.debug("Writing output files...")
+            self.output_handler.write(
+                pdf_file_name=pdf_file_name,
+                pdf_bytes=prepared_pdf,
+                middle_json=middle_json,
+                formatted_output=formatted_output,
+                output_dir=local_md_dir,
+                local_image_dir=local_image_dir,
+                model_output=model_output,
+                **options,
+            )
+        else:
+            logger.debug("Skipping output file writing (temp directory mode)")
 
         if isinstance(input_data, bytes):
             logger.info(f"Completed: {pdf_file_name} (from bytes) -> {local_md_dir}")
@@ -212,7 +232,7 @@ class DocumentPipeline:
     def process(
         self,
         input_data: str | Path | bytes,
-        output_dir: str,
+        output_dir: str | None = None,
         filename: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
@@ -226,7 +246,9 @@ class DocumentPipeline:
             input_data: Input source - can be:
                 - str or Path: Path to the input file (PDF or image)
                 - bytes: Raw file bytes (PDF or image, detected via Magika)
-            output_dir: Directory to write output files.
+            output_dir: Directory to write output files. If None, a temporary
+                directory is used and only images are saved (for downstream use).
+                Other output files (markdown, JSON, etc.) are skipped.
             filename: Name for the output file (without extension).
                 Required when input_data is bytes, optional for paths
                 (defaults to path stem).
@@ -254,7 +276,7 @@ class DocumentPipeline:
     async def aio_process_batch(
         self,
         inputs: list[str | Path | bytes | tuple[str, bytes]],
-        output_dir: str,
+        output_dir: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
         **options: Any,
@@ -266,7 +288,9 @@ class DocumentPipeline:
                 - str or Path: File path (filename derived from path stem)
                 - bytes: Raw bytes (filename defaults to "document_N")
                 - tuple[str, bytes]: (filename, raw_bytes)
-            output_dir: Directory to write output files.
+            output_dir: Directory to write output files. If None, a temporary
+                directory is used and only images are saved (for downstream use).
+                Other output files (markdown, JSON, etc.) are skipped.
             start_page_id: Starting page index (0-based).
             end_page_id: Ending page index (0-based).
             **options: Additional processing options.
@@ -312,7 +336,7 @@ class DocumentPipeline:
     def process_batch(
         self,
         inputs: list[str | Path | bytes | tuple[str, bytes]],
-        output_dir: str,
+        output_dir: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
         **options: Any,
@@ -324,7 +348,9 @@ class DocumentPipeline:
                 - str or Path: File path (filename derived from path stem)
                 - bytes: Raw bytes (filename defaults to "document_N")
                 - tuple[str, bytes]: (filename, raw_bytes)
-            output_dir: Directory to write output files.
+            output_dir: Directory to write output files. If None, a temporary
+                directory is used and only images are saved (for downstream use).
+                Other output files (markdown, JSON, etc.) are skipped.
             start_page_id: Starting page index (0-based).
             end_page_id: Ending page index (0-based).
             **options: Additional processing options.

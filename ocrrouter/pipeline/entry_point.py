@@ -8,7 +8,7 @@ from .pipeline import DocumentPipeline
 
 def process_document(
     input_path: str,
-    output_dir: str,
+    output_dir: str | None = None,
     settings: Settings | None = None,
     **overrides: Any,
 ) -> dict:
@@ -16,7 +16,9 @@ def process_document(
 
     Args:
         input_path: Path to the input PDF or image file.
-        output_dir: Directory for output files.
+        output_dir: Directory for output files. If None, a temporary
+            directory is used and only images are saved (for downstream use).
+            Other output files (markdown, JSON, etc.) are skipped.
         settings: Optional Settings object with configuration.
         **overrides: Configuration overrides (backend, openai_api_key, etc.).
 
@@ -25,6 +27,11 @@ def process_document(
 
     Example:
         >>> from ocrrouter import process_document
+        >>> # Development: just get the result (temp directory)
+        >>> result = process_document("document.pdf")
+        >>> print(result["markdown"])
+        >>>
+        >>> # Production: persist to disk
         >>> result = process_document(
         ...     "document.pdf",
         ...     "output/",

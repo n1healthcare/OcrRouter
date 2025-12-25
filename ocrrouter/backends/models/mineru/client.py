@@ -73,9 +73,13 @@ class MinerUClient:
         abandon_paratext: bool = False,
         incremental_priority: bool = False,
         executor: Executor | None = None,
-        use_tqdm: bool = True,
+        use_tqdm: bool | None = None,
     ) -> None:
         self._settings = settings
+
+        # Use settings.use_tqdm if use_tqdm is not explicitly provided
+        if use_tqdm is None:
+            use_tqdm = settings.use_tqdm
 
         self.client = new_vlm_client(
             backend="http-client",

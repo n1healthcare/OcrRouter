@@ -44,7 +44,7 @@ class CompositeClient:
         ocr_model: Literal["mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm"]
         | None = None,
         executor: Executor | None = None,
-        use_tqdm: bool = True,
+        use_tqdm: bool | None = None,
     ) -> None:
         """Initialize the composite client.
 
@@ -56,6 +56,10 @@ class CompositeClient:
             use_tqdm: Whether to show progress bars.
         """
         self._settings = settings
+
+        # Use settings.use_tqdm if use_tqdm is not explicitly provided
+        if use_tqdm is None:
+            use_tqdm = settings.use_tqdm
 
         # Use settings values if not explicitly provided
         layout_model = (

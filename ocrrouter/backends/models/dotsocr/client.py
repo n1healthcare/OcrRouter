@@ -100,7 +100,7 @@ class DotsOCRClient:
         prompts: dict[str, str] = DEFAULT_PROMPTS,
         sampling_params: dict[str, SamplingParams] = DEFAULT_SAMPLING_PARAMS,
         executor: Executor | None = None,
-        use_tqdm: bool = True,
+        use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
             raise ValueError(
@@ -108,6 +108,10 @@ class DotsOCRClient:
             )
 
         self._settings = settings
+
+        # Use settings.use_tqdm if use_tqdm is not explicitly provided
+        if use_tqdm is None:
+            use_tqdm = settings.use_tqdm
 
         # Create VLM client
         # Note: DotsOCR does not use system messages, only user messages

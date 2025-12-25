@@ -76,7 +76,7 @@ class HunyuanOCRClient:
         prompts: dict[str, str] | None = None,
         sampling_params: SamplingParams | None = None,
         executor: Executor | None = None,
-        use_tqdm: bool = True,
+        use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
             raise ValueError(
@@ -84,6 +84,10 @@ class HunyuanOCRClient:
             )
 
         self._settings = settings
+
+        # Use settings.use_tqdm if use_tqdm is not explicitly provided
+        if use_tqdm is None:
+            use_tqdm = settings.use_tqdm
 
         # Use provided prompt or default
         if prompt is None:
