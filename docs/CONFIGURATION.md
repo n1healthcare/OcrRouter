@@ -414,6 +414,20 @@ Complete reference for all configuration options.
 
 ---
 
+#### `use_tqdm`
+
+- **Type**: `bool`
+- **Default**: `True`
+- **Description**: Control whether to show progress bar during processing
+- **Example**:
+  ```python
+  Settings(use_tqdm=True)   # Show progress bar (default)
+  Settings(use_tqdm=False)  # Hide progress bar
+  ```
+- **Notes**: Useful for disabling progress bars in production environments or when integrating with other logging systems.
+
+---
+
 ### Page Range
 
 #### `start_page`

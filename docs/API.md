@@ -21,9 +21,10 @@ Simple one-liner function for document processing.
 
 ```python
 def process_document(
-    input_path: str,
-    output_dir: str,
+    input_path: str | bytes,
+    output_dir: str | None = None,
     settings: Settings | None = None,
+    filename: str | None = None,
     **overrides: Any,
 ) -> dict
 ```
@@ -32,9 +33,10 @@ def process_document(
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `input_path` | `str` | Path to the input PDF or image file |
-| `output_dir` | `str` | Directory for output files |
+| `input_path` | `str \| bytes` | Path to the input PDF/image file, or raw bytes of the document |
+| `output_dir` | `str \| None` | Directory for output files. If `None`, uses a temporary directory |
 | `settings` | `Settings \| None` | Optional Settings object with configuration |
+| `filename` | `str \| None` | Required when `input_path` is bytes. The filename for the document |
 | `**overrides` | `Any` | Configuration overrides (backend, openai_api_key, etc.) |
 
 **Returns:**
@@ -44,6 +46,7 @@ def process_document(
 ```python
 from ocrrouter import process_document
 
+# From file path
 result = process_document(
     "document.pdf",
     "output/",
@@ -52,6 +55,26 @@ result = process_document(
 )
 
 print(result["markdown"])
+
+# From bytes (filename required)
+with open("document.pdf", "rb") as f:
+    pdf_bytes = f.read()
+
+result = process_document(
+    pdf_bytes,
+    "output/",
+    filename="document.pdf",
+    backend="deepseek",
+    openai_api_key="sk-...",
+)
+
+# Using temporary directory (output_dir=None)
+result = process_document(
+    "document.pdf",
+    output_dir=None,  # Uses temp directory
+    backend="deepseek",
+    openai_api_key="sk-...",
+)
 ```
 
 ---
@@ -117,10 +140,11 @@ Process a document synchronously.
 
 ```python
 def process(
-    input_path: str | Path,
-    output_dir: str,
+    input_path: str | Path | bytes,
+    output_dir: str | None = None,
     start_page_id: int | None = None,
     end_page_id: int | None = None,
+    filename: str | None = None,
     **options: Any,
 ) -> dict
 ```
@@ -129,10 +153,11 @@ def process(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `input_path` | `str \| Path` | — | Path to the input file (PDF or image) |
-| `output_dir` | `str` | — | Directory to write output files |
+| `input_path` | `str \| Path \| bytes` | — | Path to the input file (PDF or image), or raw bytes |
+| `output_dir` | `str \| None` | `None` | Directory to write output files. If `None`, uses a temporary directory |
 | `start_page_id` | `int \| None` | `None` | Starting page index (0-based) |
 | `end_page_id` | `int \| None` | `None` | Ending page index (0-based) |
+| `filename` | `str \| None` | `None` | Required when `input_path` is bytes. The filename for the document |
 | `**options` | `Any` | — | Additional processing options |
 
 **Returns:**
@@ -152,6 +177,16 @@ result = pipeline.process(
     start_page_id=0,
     end_page_id=5
 )
+
+# Process from bytes
+with open("document.pdf", "rb") as f:
+    pdf_bytes = f.read()
+
+result = pipeline.process(pdf_bytes, "output/", filename="document.pdf")
+
+# Use temporary directory (don't save locally)
+result = pipeline.process("document.pdf", output_dir=None)
+print(result["markdown"])  # Access results directly
 ```
 
 ---
@@ -162,11 +197,12 @@ Process a document asynchronously (async/await).
 
 ```python
 async def aio_process(
-    input_path: str | Path,
-    output_dir: str,
+    input_path: str | Path | bytes,
+    output_dir: str | None = None,
     start_page_id: int | None = None,
     end_page_id: int | None = None,
     session_id: str | None = None,
+    filename: str | None = None,
     **options: Any,
 ) -> dict
 ```
@@ -175,11 +211,12 @@ async def aio_process(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `input_path` | `str \| Path` | — | Path to the input file (PDF or image) |
-| `output_dir` | `str` | — | Directory to write output files |
+| `input_path` | `str \| Path \| bytes` | — | Path to the input file (PDF or image), or raw bytes |
+| `output_dir` | `str \| None` | `None` | Directory to write output files. If `None`, uses a temporary directory |
 | `start_page_id` | `int \| None` | `None` | Starting page index (0-based) |
 | `end_page_id` | `int \| None` | `None` | Ending page index (0-based) |
 | `session_id` | `str \| None` | `None` | Optional session ID for grouping traces in batch processing |
+| `filename` | `str \| None` | `None` | Required when `input_path` is bytes. The filename for the document |
 | `**options` | `Any` | — | Additional processing options |
 
 **Returns:**
@@ -195,6 +232,20 @@ async def convert():
     return result
 
 result = asyncio.run(convert())
+
+# From bytes
+async def convert_bytes():
+    pipeline = DocumentPipeline(backend="deepseek", openai_api_key="key")
+    with open("document.pdf", "rb") as f:
+        pdf_bytes = f.read()
+    result = await pipeline.aio_process(pdf_bytes, "output/", filename="document.pdf")
+    return result
+
+# Using temporary directory
+async def convert_temp():
+    pipeline = DocumentPipeline(backend="deepseek", openai_api_key="key")
+    result = await pipeline.aio_process("document.pdf", output_dir=None)
+    return result["markdown"]  # Access results directly without saving
 ```
 
 ---
@@ -519,6 +570,8 @@ print(len(result["content_list"]))    # Number of content blocks
 
 OCRRouter supports Langfuse for observability and tracing.
 
+**Important**: OCRRouter creates spans within the provided Langfuse client but does not manage or update traces. Trace management (creating, updating, finalizing) is the responsibility of the parent application. OCRRouter is designed to be one component in a larger pipeline.
+
 ```python
 from langfuse import Langfuse
 from ocrrouter import DocumentPipeline, Settings
@@ -541,7 +594,7 @@ result = await pipeline.aio_process(
     session_id="production-batch-001"
 )
 
-# Flush and shutdown
+# Flush and shutdown (parent app's responsibility)
 langfuse.shutdown()
 ```
 
@@ -576,9 +629,10 @@ from pathlib import Path
 
 # Function signatures
 def process_document(
-    input_path: str,
-    output_dir: str,
+    input_path: str | bytes,
+    output_dir: str | None = None,
     settings: Settings | None = None,
+    filename: str | None = None,
     **overrides: Any,
 ) -> dict: ...
 
@@ -593,27 +647,29 @@ class DocumentPipeline:
 
     def process(
         self,
-        input_path: str | Path,
-        output_dir: str,
+        input_path: str | Path | bytes,
+        output_dir: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
+        filename: str | None = None,
         **options: Any,
     ) -> dict: ...
 
     async def aio_process(
         self,
-        input_path: str | Path,
-        output_dir: str,
+        input_path: str | Path | bytes,
+        output_dir: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
         session_id: str | None = None,
+        filename: str | None = None,
         **options: Any,
     ) -> dict: ...
 
     def process_batch(
         self,
         input_paths: list[str | Path],
-        output_dir: str,
+        output_dir: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
         session_id: str | None = None,
@@ -623,7 +679,7 @@ class DocumentPipeline:
     async def aio_process_batch(
         self,
         input_paths: list[str | Path],
-        output_dir: str,
+        output_dir: str | None = None,
         start_page_id: int | None = None,
         end_page_id: int | None = None,
         session_id: str | None = None,

@@ -326,6 +326,16 @@ This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE)
 - **Documentation**: Full documentation at [docs/](docs/)
 - **Examples**: See [docs/EXAMPLES.md](docs/EXAMPLES.md) and [demo/](demo/)
 
+## Acknowledgments
+
+We would like to thank the following projects for providing code and models:
+
+- [Dots.OCR](https://github.com/rednote-hilab/dots.ocr)
+- [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+- [MinerU](https://github.com/opendatalab/MinerU)
+- [HunyuanOCR](https://github.com/Tencent-Hunyuan/HunyuanOCR)
+- [DeepSeek-OCR](https://github.com/deepseek-ai/DeepSeek-OCR)
+
 ---
 
 **Built with ❤️ for document processing needs**

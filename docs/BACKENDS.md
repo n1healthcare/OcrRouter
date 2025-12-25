@@ -31,6 +31,7 @@ OCRRouter supports 6 backends, each optimized for different use cases:
 **Limitations**:
 - ✗ Does not support `ocr_only` mode (requires layout detection)
 - ✗ Slower than one-step models (two VLM calls per page)
+- ✗ In complex layouts (e.g., medical reports), layout detection may miss some words, which then never get passed to OCR
 
 **Best For**:
 - Research papers and theses
@@ -103,10 +104,12 @@ settings = Settings(
 - ✓ Good balance of speed and accuracy
 - ✓ Structured JSON output parsing
 - ✓ Detailed prompting for format control
+- ✓ Strong layout detection and OCR quality
 
 **Limitations**:
 - ✗ Less specialized than MinerU for academic content
 - ✗ May require tuning for optimal results
+- ✗ Self-hosted only (no API available). ~10-20 sec/page on L4 GPU
 
 **Best For**:
 - Documents requiring flexible processing
@@ -141,6 +144,7 @@ settings = Settings(
 **Limitations**:
 - ✗ No layout detection (cannot be used as layout model)
 - ✗ Requires another model for layout in composite mode
+- ✗ **Known issue**: Inputs outside training scope (barcodes, non-text elements) may cause infinite loops. Always use with layout detection to filter out non-text/table/chart elements.
 
 **Best For**:
 - Simple OCR tasks
@@ -172,10 +176,12 @@ settings = Settings(
 - ✓ Table parsing to HTML
 - ✓ LaTeX formula recognition
 - ✓ Content block parsing
+- ✓ Output follows document layout and structure
 
 **Limitations**:
 - ✗ No layout detection (cannot be used as layout model)
 - ✗ Requires another model for layout in composite mode
+- ✗ Limited image/figure detection (focuses more on text content in training)
 
 **Best For**:
 - Markdown-centric workflows
@@ -374,10 +380,46 @@ result = await pipeline.aio_process("document.pdf", "output/")
 | **Formulas** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | — | ⭐⭐⭐⭐ | ⭐⭐⭐ |
 | **Tables** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
 | **Processing Mode** | Two-step | One-step | Both | N/A | N/A | N/A |
-| **Speed** | ⚡⚡ | ⚡⚡⚡⚡ | ⚡⚡⚡ | ⚡⚡⚡⚡⚡ | ⚡⚡⚡⚡ | ⚡⚡⚡ |
+| **Speed** | ⚡⚡⚡⚡⚡ | ⚡⚡⚡⚡ | ⚡⚡ | ⚡⚡⚡⚡⚡ | ⚡⚡⚡⚡ | ⚡⚡⚡ |
 | **Multilingual** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
 | **Output Modes** | all, layout | all | all | ocr | ocr | ocr |
-| **Best For** | Academic | General | Flexible | Fast/Multilingual | Markdown | Custom VLM |
+| **Best For** | Academic | General | Quality | Fast/Multilingual | Markdown | Custom VLM |
+
+**Speed reference** (per page):
+- MinerU, PaddleOCR: ~1 sec
+- DeepSeek, HunyuanOCR: ~1-3 sec
+- DotsOCR: ~10-20 sec (self-hosted on L4 GPU)
+
+---
+
+## Quality Rankings (Experimental)
+
+> **Disclaimer**: These rankings are based on personal experiments and may vary depending on document types and configurations. Results should be verified for your specific use case.
+
+### Layout Detection Quality
+
+| Rank | Backend | Notes |
+|:----:|---------|-------|
+| 1 | DotsOCR | Strong layout detection accuracy |
+| 2 | MinerU | Excellent for academic/structured documents |
+| 3 | DeepSeek | Good general-purpose layout detection |
+
+### OCR Quality (Full-page OCR supported)
+
+| Rank | Backend | Notes |
+|:----:|---------|-------|
+| 1 | DotsOCR | High OCR accuracy with structure output |
+| 2 | HunyuanOCR | Good text extraction, follows document layout |
+| 3 | DeepSeek | Balanced speed and accuracy |
+
+### OCR Quality (No full-page OCR support)
+
+These backends require layout detection first and cannot perform standalone full-page OCR:
+
+| Rank | Backend | Notes |
+|:----:|---------|-------|
+| 1 | PaddleOCR | Excellent OCR within detected regions |
+| 2 | MinerU | High quality but requires layout step |
 
 ---
 
