@@ -13,7 +13,7 @@ def get_backend(backend_name: str, settings: Settings) -> BaseModelBackend:
     Args:
         backend_name: Name of the backend to instantiate.
             Currently supported: "mineru", "deepseek", "dotsocr", "composite",
-            "hunyuanocr", "generalvlm", "glmocr", "ppdoclayout"
+            "hunyuanocr", "generalvlm", "glmocr", "ppdoclayout", "lightonocr"
         settings: Settings object with configuration.
 
     Returns:
@@ -60,6 +60,10 @@ def get_backend(backend_name: str, settings: Settings) -> BaseModelBackend:
         from .models.ppdoclayout.backend import PPDocLayoutBackend
 
         return PPDocLayoutBackend(settings)
+    elif backend_name == "lightonocr":
+        from .models.lightonocr.backend import LightOnOCRBackend
+
+        return LightOnOCRBackend(settings)
     else:
         available_backends = [
             "mineru",
@@ -70,6 +74,7 @@ def get_backend(backend_name: str, settings: Settings) -> BaseModelBackend:
             "generalvlm",
             "glmocr",
             "ppdoclayout",
+            "lightonocr",
         ]
         raise ValueError(
             f"Unknown backend: '{backend_name}'. Available backends: {available_backends}"

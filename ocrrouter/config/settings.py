@@ -55,7 +55,7 @@ class Settings(BaseModel):
 
     # ============ Backend Settings ============
     backend: Literal[
-        "mineru", "deepseek", "dotsocr", "composite", "hunyuanocr", "generalvlm", "glmocr", "ppdoclayout"
+        "mineru", "deepseek", "dotsocr", "composite", "hunyuanocr", "generalvlm", "glmocr", "ppdoclayout", "lightonocr"
     ] = Field(
         default="mineru",
         description="Document processing backend to use",
@@ -113,6 +113,11 @@ class Settings(BaseModel):
     glmocr_model_name: str = Field(
         default="glm-ocr",
         description="GLM-OCR model name (Zhipu AI's OCR model)",
+    )
+
+    lightonocr_model_name: str = Field(
+        default="lighton-ocr",
+        description="LightOnOCR model name (LightOnOCR-2-1B-bbox-soup)",
     )
 
     ppdoclayout_model_dir: str = Field(

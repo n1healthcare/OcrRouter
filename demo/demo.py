@@ -198,11 +198,11 @@ def get_documents(directory: str) -> list[Path]:
 if __name__ == "__main__":
     # Configuration - create settings with your configuration
     settings = Settings(
-        backend="composite",  # Options: deepseek, mineru, dotsocr, composite, hunyuanocr, generalvlm
+        backend="lightonocr",  # Options: deepseek, mineru, dotsocr, composite, hunyuanocr, generalvlm
         output_mode="all",  # Options: all, layout_only, ocr_only
         # generalvlm_model_name="ministral-3b-2512-openrouter",  # Options: ministral-3b-2512-openrouter, ministral-7b-2512-openrouter
-        layout_model="ppdoclayout",  # Options: mineru, deepseek, dotsocr, ppdoclayout
-        ocr_model="paddleocr",  # Options: mineru, deepseek, dotsocr, paddleocr, generalvlm, glmocr
+        # layout_model="ppdoclayout",  # Options: mineru, deepseek, dotsocr, ppdoclayout
+        # ocr_model="paddleocr",  # Options: mineru, deepseek, dotsocr, paddleocr, generalvlm, glmocr
         openai_base_url=os.getenv("OPENAI_BASE_URL"),  # Your VLM server URL
         openai_api_key=os.getenv("OPENAI_API_KEY"),  # Your API key
         # start_page=0,  # Optional: starting page
