@@ -238,7 +238,7 @@ Complete reference for all configuration options.
 
 - **Type**: `str`
 - **Default**: `"deepseek-ocr"`
-- **Description**: DeepSeek-OCR model name
+- **Description**: DeepSeek-OCR 2 model name (supports v2 API with dynamic resolution and Visual Causal Flow encoding)
 - **Example**:
   ```python
   Settings(

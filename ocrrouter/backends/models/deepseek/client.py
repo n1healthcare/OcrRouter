@@ -1,4 +1,4 @@
-"""DeepSeek-OCR client for VLM inference."""
+"""DeepSeek-OCR 2 client for VLM inference."""
 
 import asyncio
 from concurrent.futures import Executor
@@ -21,7 +21,7 @@ from ocrrouter.backends.utils import (
 
 
 class DeepSeekSamplingParams(SamplingParams):
-    """Sampling parameters optimized for DeepSeek-OCR."""
+    """Sampling parameters optimized for DeepSeek-OCR 2."""
 
     def __init__(
         self,
@@ -62,19 +62,25 @@ DEFAULT_SAMPLING_PARAMS: dict[str, SamplingParams] = {
     "[default]": DeepSeekSamplingParams(),
 }
 
-# DeepSeek-specific vLLM extra body parameters
+# DeepSeek-specific vLLM extra body parameters (v2)
 DEEPSEEK_VLLM_XARGS = {
-    "ngram_size": 30,
+    "ngram_size": 20,  # v2: reduced from 30 to 20
     "window_size": 90,
-    "whitelist_token_ids": [128821, 128822],
+    "whitelist_token_ids": [128821, 128822],  # <td>, </td>
 }
 
 
 class DeepSeekClient:
-    """DeepSeek-OCR client for document analysis.
+    """DeepSeek-OCR 2 client for document analysis.
 
-    This client uses DeepSeek-OCR model which can return both layout detection
-    and content extraction in a single API call using the grounding prompt.
+    This client uses the DeepSeek-OCR 2 model which can return both layout
+    detection and content extraction in a single API call using the grounding
+    prompt.
+
+    DeepSeek-OCR 2 improvements over v1:
+    - Dynamic resolution with tiling for large images
+    - Visual Causal Flow encoding for better accuracy
+    - Reduced ngram_size (20 vs 30) for better repetition handling
 
     Example:
         >>> client = DeepSeekClient()

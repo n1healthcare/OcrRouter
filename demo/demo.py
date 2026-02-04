@@ -28,10 +28,17 @@ def create_langfuse_client():
         Langfuse client if env vars are set, None otherwise.
 
     Environment variables:
+        LANGFUSE_ENABLED: Set to 'true' to enable Langfuse (default: true if keys are set)
         LANGFUSE_PUBLIC_KEY: Langfuse public API key
         LANGFUSE_SECRET_KEY: Langfuse secret API key
         LANGFUSE_HOST: Optional Langfuse host URL (default: https://cloud.langfuse.com)
     """
+    # Check if Langfuse is explicitly disabled
+    langfuse_enabled = os.getenv("LANGFUSE_ENABLED", "true").lower() == "true"
+    if not langfuse_enabled:
+        logger.debug("Langfuse disabled via LANGFUSE_ENABLED=false")
+        return None
+
     public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
     secret_key = os.getenv("LANGFUSE_SECRET_KEY")
 
@@ -191,9 +198,9 @@ def get_documents(directory: str) -> list[Path]:
 if __name__ == "__main__":
     # Configuration - create settings with your configuration
     settings = Settings(
-        backend="generalvlm",  # Options: deepseek, mineru, dotsocr, composite, hunyuanocr, generalvlm
-        output_mode="ocr_only",  # Options: all, layout_only, ocr_only
-        generalvlm_model_name="ministral-3b-2512-openrouter",  # Options: ministral-3b-2512-openrouter, ministral-7b-2512-openrouter
+        backend="deepseek",  # Options: deepseek, mineru, dotsocr, composite, hunyuanocr, generalvlm
+        output_mode="all",  # Options: all, layout_only, ocr_only
+        # generalvlm_model_name="ministral-3b-2512-openrouter",  # Options: ministral-3b-2512-openrouter, ministral-7b-2512-openrouter
         # layout_model="mineru",  # Options: mineru, deepseek, dotsocr
         # ocr_model="mineru",  # Options: mineru, deepseek, dotsocr, paddleocr, generalvlm
         openai_base_url=os.getenv("OPENAI_BASE_URL"),  # Your VLM server URL
@@ -230,6 +237,19 @@ if __name__ == "__main__":
             output_dir=output_dir,
             settings=settings,
             langfuse=langfuse,
-            max_concurrency=4,
+            max_concurrency=5,
         )
-    langfuse.shutdown() if langfuse else None
+
+    # Shutdown langfuse with timeout to prevent hanging
+    if langfuse:
+        try:
+            import threading
+
+            shutdown_thread = threading.Thread(target=langfuse.shutdown)
+            shutdown_thread.daemon = True
+            shutdown_thread.start()
+            shutdown_thread.join(timeout=5.0)  # Wait max 5 seconds
+            if shutdown_thread.is_alive():
+                logger.warning("Langfuse shutdown timed out after 5 seconds")
+        except Exception as e:
+            logger.warning(f"Error during langfuse shutdown: {e}")

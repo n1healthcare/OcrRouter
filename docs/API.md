@@ -440,7 +440,7 @@ settings = Settings(
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
 | `mineru_model_name` | `str` | `"mineru-2.5"` | MinerU model name |
-| `deepseek_model_name` | `str` | `"deepseek-ocr"` | DeepSeek model name |
+| `deepseek_model_name` | `str` | `"deepseek-ocr"` | DeepSeek-OCR 2 model name |
 | `dotsocr_model_name` | `str` | `"dots-ocr"` | DotsOCR model name |
 | `hunyuan_model_name` | `str` | `"hunyuan-ocr"` | Hunyuan model name |
 | `paddleocr_model_name` | `str` | `"paddle-ocr"` | PaddleOCR model name |

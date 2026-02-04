@@ -1,4 +1,11 @@
-"""DeepSeek-specific postprocessor for parsing and processing model outputs."""
+"""DeepSeek-OCR 2 postprocessor for parsing and processing model outputs.
+
+Supports two output formats:
+- v1 format: <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2]]<|/det|>content
+- v2 format: label[[x1, y1, x2, y2]]content
+
+Both formats use bbox range 0-999 (normalized to 0-1 during parsing).
+"""
 
 import ast
 import re
@@ -9,10 +16,13 @@ from ocrrouter.backends.utils import ContentBlock, BLOCK_TYPES
 from .utils.structs import map_deepseek_label
 
 
-# DeepSeek grounding format regex
+# DeepSeek v1 grounding format regex
 # Format: <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2]]<|/det|>content
-# or multi-bbox: <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2], [x1, y1, x2, y2]]<|/det|>content
-_GROUNDING_PATTERN = re.compile(r"<\|ref\|>(.+?)<\|/ref\|><\|det\|>(\[.+?\])<\|/det\|>")
+_GROUNDING_PATTERN_V1 = re.compile(r"<\|ref\|>(.+?)<\|/ref\|><\|det\|>(\[.+?\])<\|/det\|>")
+
+# DeepSeek v2 grounding format regex
+# Format: label[[x1, y1, x2, y2]]content or label[[x1, y1, x2, y2], [x1, y1, x2, y2]]content
+_GROUNDING_PATTERN_V2 = re.compile(r"(\w+)\[\[([\d,\s\[\]]+)\]\]")
 
 # Pattern to extract HTML table from content
 _TABLE_HTML_PATTERN = re.compile(r"<table>.*?</table>", re.DOTALL)
@@ -52,29 +62,62 @@ def _convert_bbox_deepseek(
     return [x1 / 999.0, y1 / 999.0, x2 / 999.0, y2 / 999.0]
 
 
-def _parse_coords_array(coords_str: str) -> list[list[int]] | None:
+def _parse_coords_array(coords_str: str, is_v2: bool = False) -> list[list[int]] | None:
     """Parse coordinates array from string.
 
-    Handles both single bbox: [[x1, y1, x2, y2]]
-    and multi-bbox: [[x1, y1, x2, y2], [x1, y1, x2, y2], ...]
+    Handles multiple formats:
+    - v1 single bbox: [[x1, y1, x2, y2]]
+    - v1 multi-bbox: [[x1, y1, x2, y2], [x1, y1, x2, y2], ...]
+    - v2 single bbox: x1, y1, x2, y2 (no brackets)
+    - v2 multi-bbox: x1, y1, x2, y2], [x1, y1, x2, y2 (captured without outer brackets)
 
     Args:
-        coords_str: String like "[[134, 213, 836, 241]]" or "[[73, 749, 488, 915], [508, 236, 920, 295]]"
+        coords_str: Coordinate string in v1 or v2 format
+        is_v2: Whether this is v2 format (different parsing)
 
     Returns:
         List of coordinate lists, or None on parse error
     """
     try:
-        parsed = ast.literal_eval(coords_str)
-        # Check if it's a single bbox wrapped in one list: [[x1, y1, x2, y2]]
-        if isinstance(parsed, list) and len(parsed) > 0:
-            if isinstance(parsed[0], int):
-                # Single bbox without outer wrapper: [x1, y1, x2, y2]
-                return [parsed]
-            elif isinstance(parsed[0], list):
-                # Multiple bboxes or single wrapped: [[x1, y1, x2, y2]] or [[...], [...]]
-                return parsed
-        return None
+        if is_v2:
+            # v2 format captured from regex (inside the [[ ]])
+            # Could be: "x1, y1, x2, y2" (single) or "x1,y1,x2,y2], [x1,y1,x2,y2" (multi, without outer [])
+            coords_str = coords_str.strip()
+
+            # Check if this is multi-bbox (contains "], [" pattern)
+            if "], [" in coords_str or "],[" in coords_str:
+                # Multi-bbox: wrap with [[ ]] to make it a valid nested list
+                parsed = ast.literal_eval(f"[[{coords_str}]]")
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    if isinstance(parsed[0], list):
+                        return parsed
+                return None
+            elif coords_str.startswith("["):
+                # Single bbox with brackets: [x1, y1, x2, y2]
+                parsed = ast.literal_eval(f"[{coords_str}]")
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    if isinstance(parsed[0], list):
+                        return parsed
+                    else:
+                        return [parsed]
+                return None
+            else:
+                # Single bbox without brackets: "x1, y1, x2, y2"
+                coords = [int(x.strip()) for x in coords_str.split(",")]
+                if len(coords) == 4:
+                    return [coords]
+                return None
+        else:
+            # v1 format: "[[x1, y1, x2, y2]]" or "[[...], [...]]"
+            parsed = ast.literal_eval(coords_str)
+            if isinstance(parsed, list) and len(parsed) > 0:
+                if isinstance(parsed[0], int):
+                    # Single bbox without outer wrapper: [x1, y1, x2, y2]
+                    return [parsed]
+                elif isinstance(parsed[0], list):
+                    # Multiple bboxes or single wrapped: [[x1, y1, x2, y2]] or [[...], [...]]
+                    return parsed
+            return None
     except (ValueError, SyntaxError) as e:
         print(f"Warning: failed to parse coords '{coords_str}': {e}")
         return None
@@ -158,13 +201,9 @@ class DeepSeekPostprocessor(BasePostprocessor):
     ) -> list[ContentBlock]:
         """Parse DeepSeek grounding output to ContentBlocks.
 
-        The grounding output format is:
-        <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2]]<|/det|>
-        Content text here...
-
-        Or with multiple bboxes (for content spanning columns/areas):
-        <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2], [x1, y1, x2, y2]]<|/det|>
-        Content text here...
+        Supports two formats:
+        - v1: <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2]]<|/det|>content
+        - v2: label[[x1, y1, x2, y2]]content
 
         Args:
             output: Raw model output string.
@@ -175,15 +214,27 @@ class DeepSeekPostprocessor(BasePostprocessor):
         """
         blocks: list[ContentBlock] = []
 
-        # Find all grounding markers and their positions
-        matches = list(_GROUNDING_PATTERN.finditer(output))
+        # Try v1 format first
+        matches_v1 = list(_GROUNDING_PATTERN_V1.finditer(output))
+        matches_v2 = list(_GROUNDING_PATTERN_V2.finditer(output))
+
+        # Use whichever format has more matches (v2 typically)
+        if len(matches_v1) >= len(matches_v2) and len(matches_v1) > 0:
+            matches = matches_v1
+            is_v2 = False
+        elif len(matches_v2) > 0:
+            matches = matches_v2
+            is_v2 = True
+        else:
+            # No matches found
+            return blocks
 
         for i, match in enumerate(matches):
             label_type = match.group(1)
             coords_str = match.group(2)
 
             # Parse coordinates (handles both single and multi-bbox)
-            coords_list = _parse_coords_array(coords_str)
+            coords_list = _parse_coords_array(coords_str, is_v2=is_v2)
             if coords_list is None:
                 print(f"Warning: failed to parse coords in match: {match.group(0)}")
                 continue

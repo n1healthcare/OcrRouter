@@ -1,4 +1,4 @@
-"""DeepSeek-OCR backend implementation for document processing."""
+"""DeepSeek-OCR 2 backend implementation for document processing."""
 
 from typing import Any, Literal
 
@@ -15,15 +15,17 @@ from .client import DeepSeekClient
 
 
 class DeepSeekBackend(BaseModelBackend):
-    """DeepSeek-OCR backend for document analysis using Vision Language Models.
+    """DeepSeek-OCR 2 backend for document analysis using Vision Language Models.
 
-    This backend uses the DeepSeek-OCR model to:
+    This backend uses the DeepSeek-OCR 2 model to:
     1. Detect document layout using grounding mode
     2. Extract content from each detected region (in the same call)
     3. Convert results to structured JSON format (same as MinerU)
 
-    DeepSeek's grounding mode is more efficient than MinerU's two-step approach
-    because it returns both layout and content in a single API call.
+    DeepSeek-OCR 2 features:
+    - Dynamic resolution with tiling (base 1024, tiles 768)
+    - Improved visual encoding with Visual Causal Flow
+    - More efficient ngram-based no-repeat processing
 
     Example:
         >>> from ocrrouter import Settings

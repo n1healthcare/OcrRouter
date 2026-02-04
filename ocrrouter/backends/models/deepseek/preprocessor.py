@@ -1,4 +1,8 @@
-"""DeepSeek-specific image preprocessing before model inference."""
+"""DeepSeek-OCR 2 image preprocessing before model inference.
+
+Note: Dynamic resolution/tiling (base 1024, tiles 768) is handled server-side.
+The client preprocessor just converts images to RGB PNG format.
+"""
 
 from PIL import Image
 

@@ -82,7 +82,7 @@ class Settings(BaseModel):
 
     deepseek_model_name: str = Field(
         default="deepseek-ocr",
-        description="DeepSeek-OCR model name",
+        description="DeepSeek-OCR 2 model name (supports v2 API)",
     )
 
     dotsocr_model_name: str = Field(

@@ -1,4 +1,4 @@
-"""DeepSeek-OCR backend for document processing using Vision Language Models."""
+"""DeepSeek-OCR 2 backend for document processing using Vision Language Models."""
 
 from .backend import DeepSeekBackend
 from .client import DeepSeekClient

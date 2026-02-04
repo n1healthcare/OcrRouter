@@ -57,7 +57,7 @@ settings = Settings(
 
 ---
 
-### 2. DeepSeek-OCR
+### 2. DeepSeek-OCR 2
 
 **Capabilities**: Layout Detection + OCR
 
@@ -69,6 +69,8 @@ settings = Settings(
 - ✓ Precise bounding box coordinates
 - ✓ Good formula and table support
 - ✓ 2-3x faster than two-step models
+- ✓ Dynamic resolution with tiling for large images (v2)
+- ✓ Visual Causal Flow encoding for improved accuracy (v2)
 
 **Limitations**:
 - ✗ May be less specialized for academic content than MinerU

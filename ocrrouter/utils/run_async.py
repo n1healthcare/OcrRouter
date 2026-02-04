@@ -29,8 +29,29 @@ def run_async(coroutine: Coroutine[Any, Any, T]) -> T:
         nest_asyncio.apply()
         return loop.run_until_complete(coroutine)
     except RuntimeError:
-        # No event loop exists, create a new one
-        return asyncio.run(coroutine)
+        # No event loop exists, create a new one and ensure proper cleanup
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(coroutine)
+        finally:
+            try:
+                # Cancel all remaining tasks
+                pending = asyncio.all_tasks(loop)
+                for task in pending:
+                    task.cancel()
+                # Wait for all tasks to complete cancellation
+                if pending:
+                    loop.run_until_complete(
+                        asyncio.gather(*pending, return_exceptions=True)
+                    )
+                # Shutdown async generators
+                loop.run_until_complete(loop.shutdown_asyncgens())
+                # Shutdown default executor
+                loop.run_until_complete(loop.shutdown_default_executor())
+            finally:
+                loop.close()
+                asyncio.set_event_loop(None)
 
 
 def iter_async(iterable: AsyncIterable[T]) -> Iterable[T]:

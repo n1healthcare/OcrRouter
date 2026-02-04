@@ -516,10 +516,11 @@ def get_body_data(para_block):
 def merge_para_with_text_v2(para_block):
     para_content = []
     para_type = para_block["type"]
-    for line in para_block["lines"]:
-        for span in line["spans"]:
-            span_type = span["type"]
-            if span["content"]:
+    for line in para_block.get("lines", []):
+        for span in line.get("spans", []):
+            span_type = span.get("type")
+            span_content = span.get("content")
+            if span_content:
                 if (
                     para_type == BlockType.PHONETIC
                     and span_type == ContentTypeV2.SPAN_TEXT
@@ -534,11 +535,11 @@ def merge_para_with_text_v2(para_block):
                     ContentTypeV2.SPAN_MD,
                     ContentTypeV2.SPAN_CODE_INLINE,
                 ]:
-                    span_content = {
+                    span_item = {
                         "type": span_type,
-                        "content": span["content"],
+                        "content": span_content,
                     }
-                    para_content.append(span_content)
+                    para_content.append(span_item)
                 else:
                     logger.warning(
                         f"Unknown span type in merge_para_with_text_v2: {span_type}"
