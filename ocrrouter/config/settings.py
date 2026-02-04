@@ -55,20 +55,20 @@ class Settings(BaseModel):
 
     # ============ Backend Settings ============
     backend: Literal[
-        "mineru", "deepseek", "dotsocr", "composite", "hunyuanocr", "generalvlm"
+        "mineru", "deepseek", "dotsocr", "composite", "hunyuanocr", "generalvlm", "glmocr", "ppdoclayout"
     ] = Field(
         default="mineru",
         description="Document processing backend to use",
     )
 
     # ============ Composite Backend Settings ============
-    layout_model: Literal["mineru", "deepseek", "dotsocr"] = Field(
+    layout_model: Literal["mineru", "deepseek", "dotsocr", "ppdoclayout"] = Field(
         default="mineru",
         description="Model to use for layout detection in composite mode",
     )
 
     ocr_model: Literal[
-        "mineru", "deepseek", "dotsocr", "hunyuanocr", "paddleocr", "generalvlm"
+        "mineru", "deepseek", "dotsocr", "hunyuanocr", "paddleocr", "generalvlm", "glmocr"
     ] = Field(
         default="mineru",
         description="Model to use for OCR extraction in composite mode",
@@ -108,6 +108,16 @@ class Settings(BaseModel):
     generalvlm_model_name: str = Field(
         default="gemini-2.5-pro",
         description="General VLM model name (supports GPT, Claude, Gemini, etc.)",
+    )
+
+    glmocr_model_name: str = Field(
+        default="glm-ocr",
+        description="GLM-OCR model name (Zhipu AI's OCR model)",
+    )
+
+    ppdoclayout_model_dir: str = Field(
+        default="PaddlePaddle/PP-DocLayoutV3_safetensors",
+        description="PP-DocLayoutV3 model directory (HuggingFace model ID or local path)",
     )
 
     # ============ Output Mode ============

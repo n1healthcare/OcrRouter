@@ -22,26 +22,27 @@ class CompositeClient:
     - Use one model's layout detection capabilities
     - Use another model's OCR extraction capabilities
 
-    Supported combinations:
-    | Layout Model | OCR Model |
-    |--------------|-----------|
-    | mineru       | deepseek  |
-    | mineru       | dotsocr   |
-    | deepseek     | mineru    |
-    | deepseek     | dotsocr   |
-    | dotsocr      | mineru    |
-    | dotsocr      | deepseek  |
+    Layout models: mineru, deepseek, dotsocr, ppdoclayout
+    OCR models: mineru, deepseek, dotsocr, paddleocr, generalvlm, glmocr
+
+    Example combinations:
+    | Layout Model | OCR Model | Description |
+    |--------------|-----------|-------------|
+    | ppdoclayout  | glmocr    | PP-DocLayoutV3 + GLM-OCR |
+    | ppdoclayout  | paddleocr | PP-DocLayoutV3 + PaddleOCR |
+    | mineru       | deepseek  | MinerU layout + DeepSeek OCR |
+    | deepseek     | glmocr    | DeepSeek layout + GLM-OCR |
 
     Example:
-        >>> client = CompositeClient(layout_model="mineru", ocr_model="deepseek")
+        >>> client = CompositeClient(layout_model="ppdoclayout", ocr_model="glmocr")
         >>> blocks = await client.aio_two_step_extract(image)
     """
 
     def __init__(
         self,
         settings: Settings,
-        layout_model: Literal["mineru", "deepseek", "dotsocr"] | None = None,
-        ocr_model: Literal["mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm"]
+        layout_model: Literal["mineru", "deepseek", "dotsocr", "ppdoclayout"] | None = None,
+        ocr_model: Literal["mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm", "glmocr"]
         | None = None,
         executor: Executor | None = None,
         use_tqdm: bool | None = None,
@@ -101,7 +102,8 @@ class CompositeClient:
 
         Args:
             settings: Settings object with configuration.
-            model_type: Type of model ("mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm")
+            model_type: Type of model. Layout: "mineru", "deepseek", "dotsocr", "ppdoclayout".
+                OCR: "mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm", "glmocr".
             executor: Executor for CPU-bound operations.
             use_tqdm: Whether to show progress bars.
 
@@ -144,6 +146,22 @@ class CompositeClient:
             from ocrrouter.backends.models.generalvlm.client import GeneralVLMClient
 
             return GeneralVLMClient(
+                settings=settings,
+                executor=executor,
+                use_tqdm=use_tqdm,
+            )
+        elif model_type == "glmocr":
+            from ocrrouter.backends.models.glmocr.client import GlmOCRClient
+
+            return GlmOCRClient(
+                settings=settings,
+                executor=executor,
+                use_tqdm=use_tqdm,
+            )
+        elif model_type == "ppdoclayout":
+            from ocrrouter.backends.models.ppdoclayout.client import PPDocLayoutClient
+
+            return PPDocLayoutClient(
                 settings=settings,
                 executor=executor,
                 use_tqdm=use_tqdm,

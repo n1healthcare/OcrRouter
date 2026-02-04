@@ -1,0 +1,15 @@
+"""PP-DocLayoutV3 utilities."""
+
+from .structs import (
+    DEFAULT_ID2LABEL,
+    DEFAULT_LABEL_TASK_MAPPING,
+    DEFAULT_THRESHOLD,
+    LABEL_TO_CONTENT_BLOCK_TYPE,
+)
+
+__all__ = [
+    "DEFAULT_ID2LABEL",
+    "DEFAULT_LABEL_TASK_MAPPING",
+    "DEFAULT_THRESHOLD",
+    "LABEL_TO_CONTENT_BLOCK_TYPE",
+]
