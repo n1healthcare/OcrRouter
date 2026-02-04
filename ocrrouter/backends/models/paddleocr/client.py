@@ -47,12 +47,15 @@ class PaddleOCRSamplingParams(SamplingParams):
 
 
 # PaddleOCR task-specific prompts
+# v1.5 adds: spotting (text line localization + recognition), seal (seal/stamp recognition)
 DEFAULT_PROMPTS: dict[str, str] = {
     "[default]": "OCR:",
     "text": "OCR:",
     "table": "Table Recognition:",
     "equation": "Formula Recognition:",
     "chart": "Chart Recognition:",
+    "spotting": "Spotting:",  # v1.5: text spotting (localization + recognition)
+    "seal": "Seal Recognition:",  # v1.5: seal/stamp text extraction
 }
 
 DEFAULT_SAMPLING_PARAMS = PaddleOCRSamplingParams()
