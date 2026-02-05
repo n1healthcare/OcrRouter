@@ -32,7 +32,7 @@ class LightOnOCRSamplingParams(SamplingParams):
         frequency_penalty: float | None = None,
         repetition_penalty: float | None = None,
         no_repeat_ngram_size: int | None = None,
-        max_new_tokens: int | None = 4096,
+        max_new_tokens: int | None = 8192,
     ):
         super().__init__(
             temperature,
@@ -199,9 +199,7 @@ class LightOnOCRClient:
                         image, output_mode, priority, semaphore
                     )
         else:
-            return await self._do_layout_detect(
-                image, output_mode, priority, semaphore
-            )
+            return await self._do_layout_detect(image, output_mode, priority, semaphore)
 
     async def aio_batch_layout_detect(
         self,

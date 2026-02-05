@@ -37,7 +37,7 @@ class GlmOCRSamplingParams(SamplingParams):
         frequency_penalty: float | None = None,
         repetition_penalty: float | None = 1.1,
         no_repeat_ngram_size: int | None = None,
-        max_new_tokens: int | None = 4096,
+        max_new_tokens: int | None = 8192,
     ):
         super().__init__(
             temperature,
