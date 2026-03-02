@@ -214,8 +214,4 @@ class HunyuanOCRPostprocessor(BasePostprocessor):
         so this filters out empty text blocks.
         """
         # Filter out empty text blocks
-        return [
-            block
-            for block in blocks
-            if block.type != "text" or (block.content and block.content.strip())
-        ]
+        return [block for block in blocks if block.type != "text" or (block.content and block.content.strip())]

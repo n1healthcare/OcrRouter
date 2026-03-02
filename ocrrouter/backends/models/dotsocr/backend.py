@@ -101,9 +101,7 @@ class DotsOCRBackend(BaseModelBackend):
         elif output_mode == "ocr_only":
             # Full-page OCR - skip layout detection
             logger.debug("Running full-page OCR only (ocr_only mode)")
-            ocr_texts = await self.client.aio_batch_content_extract(
-                images=images_pil_list
-            )
+            ocr_texts = await self.client.aio_batch_content_extract(images=images_pil_list)
             # Convert OCR texts to full-page ContentBlocks
             results = []
             for text in ocr_texts:
@@ -121,13 +119,9 @@ class DotsOCRBackend(BaseModelBackend):
         else:  # "all" mode - default behavior
             # Run DotsOCR model based on extraction mode from settings
             if self._settings.dotsocr_extraction_mode == "one_step":
-                results = await self.client.aio_batch_one_step_extract(
-                    images=images_pil_list
-                )
+                results = await self.client.aio_batch_one_step_extract(images=images_pil_list)
             else:  # two_step
-                results = await self.client.aio_batch_two_step_extract(
-                    images=images_pil_list
-                )
+                results = await self.client.aio_batch_two_step_extract(images=images_pil_list)
 
         # Resolve table_merge_enable from settings if not provided
         if table_merge_enable is None:

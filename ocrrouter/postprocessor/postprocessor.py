@@ -45,12 +45,8 @@ class Postprocessor:
             Dictionary containing formatted outputs.
         """
         make_mode = make_mode if make_mode is not None else self._settings.make_md_mode
-        formula_enable = (
-            formula_enable if formula_enable is not None else self._settings.formula_enable
-        )
-        table_enable = (
-            table_enable if table_enable is not None else self._settings.table_enable
-        )
+        formula_enable = formula_enable if formula_enable is not None else self._settings.formula_enable
+        table_enable = table_enable if table_enable is not None else self._settings.table_enable
         output_mode = output_mode or self._settings.output_mode
 
         pdf_info = middle_json.get("pdf_info", [])
@@ -113,12 +109,8 @@ class Postprocessor:
         Returns:
             Markdown string.
         """
-        formula_enable = (
-            formula_enable if formula_enable is not None else self._settings.formula_enable
-        )
-        table_enable = (
-            table_enable if table_enable is not None else self._settings.table_enable
-        )
+        formula_enable = formula_enable if formula_enable is not None else self._settings.formula_enable
+        table_enable = table_enable if table_enable is not None else self._settings.table_enable
 
         pdf_info = middle_json.get("pdf_info", [])
         return union_make(
@@ -149,12 +141,8 @@ class Postprocessor:
         Returns:
             Content list.
         """
-        formula_enable = (
-            formula_enable if formula_enable is not None else self._settings.formula_enable
-        )
-        table_enable = (
-            table_enable if table_enable is not None else self._settings.table_enable
-        )
+        formula_enable = formula_enable if formula_enable is not None else self._settings.formula_enable
+        table_enable = table_enable if table_enable is not None else self._settings.table_enable
 
         pdf_info = middle_json.get("pdf_info", [])
         mode = MakeMode.CONTENT_LIST if version == 1 else MakeMode.CONTENT_LIST_V2

@@ -113,18 +113,12 @@ def _sanitize_messages(messages: list) -> list:
         if isinstance(content, dict):
             result = {}
             for key, value in content.items():
-                if (
-                    key == "url"
-                    and isinstance(value, str)
-                    and value.startswith("data:image")
-                ):
+                if key == "url" and isinstance(value, str) and value.startswith("data:image"):
                     match = re.match(r"(data:image/[^;]+;base64,)(.+)", value)
                     if match:
                         prefix = match.group(1)
                         base64_data = match.group(2)
-                        result[key] = (
-                            f"{prefix}{base64_data[:50]}...<truncated {len(base64_data)} chars>"
-                        )
+                        result[key] = f"{prefix}{base64_data[:50]}...<truncated {len(base64_data)} chars>"
                     else:
                         result[key] = value
                 else:
@@ -144,9 +138,7 @@ def _sanitize_messages(messages: list) -> list:
     return [_sanitize_for_json(msg) for msg in sanitized]
 
 
-def cleanup_old_debug_files(
-    debug_dir: str | Path | None = None, keep_last_n: int = 100
-) -> None:
+def cleanup_old_debug_files(debug_dir: str | Path | None = None, keep_last_n: int = 100) -> None:
     """Clean up old debug files, keeping only the most recent N entries.
 
     Args:

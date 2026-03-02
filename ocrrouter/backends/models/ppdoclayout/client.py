@@ -82,6 +82,7 @@ class PPDocLayoutClient:
         if device is None:
             try:
                 import torch
+
                 if torch.cuda.is_available():
                     device = "cuda:0"
                 else:
@@ -145,12 +146,8 @@ class PPDocLayoutClient:
                 PPDocLayoutV3ImageProcessorFast,
             )
 
-            self._image_processor = PPDocLayoutV3ImageProcessorFast.from_pretrained(
-                self.model_dir
-            )
-            self._model = PPDocLayoutV3ForObjectDetection.from_pretrained(
-                self.model_dir
-            )
+            self._image_processor = PPDocLayoutV3ImageProcessorFast.from_pretrained(self.model_dir)
+            self._model = PPDocLayoutV3ForObjectDetection.from_pretrained(self.model_dir)
             model_loaded = True
             logger.debug("Loaded PP-DocLayoutV3 using native transformers classes")
         except ImportError as e:
@@ -331,11 +328,13 @@ class PPDocLayoutClient:
             y2 = (cy + h / 2) * height
             scaled_boxes = torch.stack([x1, y1, x2, y2], dim=-1)
 
-            results.append({
-                "scores": filtered_scores,
-                "labels": filtered_labels,
-                "boxes": scaled_boxes,
-            })
+            results.append(
+                {
+                    "scores": filtered_scores,
+                    "labels": filtered_labels,
+                    "boxes": scaled_boxes,
+                }
+            )
 
         return results
 
@@ -437,9 +436,7 @@ class PPDocLayoutClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_layout_detect(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_layout_detect(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -459,6 +456,5 @@ class PPDocLayoutClient:
             NotImplementedError: PP-DocLayoutV3 is layout detection only.
         """
         raise NotImplementedError(
-            "PP-DocLayoutV3 is a layout detection model only. "
-            "Use a different backend for OCR extraction."
+            "PP-DocLayoutV3 is a layout detection model only. Use a different backend for OCR extraction."
         )

@@ -105,9 +105,7 @@ class DotsOCRClient:
         use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
-            raise ValueError(
-                f"Unsupported backend: {backend}. Only 'http-client' is supported."
-            )
+            raise ValueError(f"Unsupported backend: {backend}. Only 'http-client' is supported.")
 
         self._settings = settings
 
@@ -168,19 +166,13 @@ class DotsOCRClient:
         ) = await self.preprocessor.aio_prepare_for_layout(self.executor, image)
 
         prompt = self.prompts.get("[layout_only]") or self.prompts["[default]"]
-        params = self.sampling_params.get("[layout_only]") or self.sampling_params.get(
-            "[default]"
-        )
+        params = self.sampling_params.get("[layout_only]") or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                layout_image, prompt, params, priority
-            )
+            output = await self.client.aio_predict(layout_image, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    layout_image, prompt, params, priority
-                )
+                output = await self.client.aio_predict(layout_image, prompt, params, priority)
 
         return await self.postprocessor.aio_parse_layout_output(
             self.executor,
@@ -217,9 +209,7 @@ class DotsOCRClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="layout-dotsocr-detection"
-                    ):
+                    with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
                         return await self._do_layout_detect(image, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
@@ -251,9 +241,7 @@ class DotsOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_layout_detect(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_layout_detect(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -282,19 +270,13 @@ class DotsOCRClient:
         image_bytes = get_png_bytes(image)
 
         prompt = self.prompts.get("[ocr]") or self.prompts["[default]"]
-        params = self.sampling_params.get("[ocr]") or self.sampling_params.get(
-            "[default]"
-        )
+        params = self.sampling_params.get("[ocr]") or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                image_bytes, prompt, params, priority
-            )
+            output = await self.client.aio_predict(image_bytes, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    image_bytes, prompt, params, priority
-                )
+                output = await self.client.aio_predict(image_bytes, prompt, params, priority)
 
         return output.strip() if output else None
 
@@ -324,14 +306,10 @@ class DotsOCRClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="ocr-dotsocr-extraction"):
-                        return await self._do_content_extract(
-                            image, type, priority, semaphore
-                        )
+                        return await self._do_content_extract(image, type, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-dotsocr-extraction"):
-                    return await self._do_content_extract(
-                        image, type, priority, semaphore
-                    )
+                    return await self._do_content_extract(image, type, priority, semaphore)
         else:
             return await self._do_content_extract(image, type, priority, semaphore)
 
@@ -363,9 +341,7 @@ class DotsOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(
-                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_content_extract(img, t, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -399,19 +375,13 @@ class DotsOCRClient:
         ) = await self.preprocessor.aio_prepare_for_layout(self.executor, image)
 
         prompt = self.prompts.get("[layout_all]") or self.prompts["[default]"]
-        params = self.sampling_params.get("[layout_all]") or self.sampling_params.get(
-            "[default]"
-        )
+        params = self.sampling_params.get("[layout_all]") or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                layout_image, prompt, params, priority
-            )
+            output = await self.client.aio_predict(layout_image, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    layout_image, prompt, params, priority
-                )
+                output = await self.client.aio_predict(layout_image, prompt, params, priority)
 
         blocks = await self.postprocessor.aio_parse_layout_output(
             self.executor,
@@ -451,12 +421,8 @@ class DotsOCRClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="layout-dotsocr-detection"
-                    ):
-                        return await self._do_one_step_extract(
-                            image, priority, semaphore
-                        )
+                    with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
+                        return await self._do_one_step_extract(image, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
                     return await self._do_one_step_extract(image, priority, semaphore)
@@ -487,9 +453,7 @@ class DotsOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_one_step_extract(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_one_step_extract(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -548,10 +512,7 @@ class DotsOCRClient:
         # Extract content for all blocks (using _do_content_extract to avoid nested spans)
         if block_images:
             contents = await gather_tasks(
-                tasks=[
-                    self._do_content_extract(img, "text", priority, semaphore)
-                    for img in block_images
-                ],
+                tasks=[self._do_content_extract(img, "text", priority, semaphore) for img in block_images],
                 use_tqdm=False,
             )
 
@@ -589,9 +550,7 @@ class DotsOCRClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="layout-dotsocr-detection"
-                    ):
+                    with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
                         blocks = await self._do_layout_detect(
                             image,
                             priority,
@@ -626,19 +585,14 @@ class DotsOCRClient:
                         if block_images:
                             contents = await gather_tasks(
                                 tasks=[
-                                    self._do_content_extract(
-                                        img, "text", priority, semaphore
-                                    )
-                                    for img in block_images
+                                    self._do_content_extract(img, "text", priority, semaphore) for img in block_images
                                 ],
                                 use_tqdm=False,
                             )
                             for idx, content in zip(block_indices, contents):
                                 blocks[idx].content = content
 
-                        return await self.postprocessor.aio_post_process_blocks(
-                            self.executor, blocks
-                        )
+                        return await self.postprocessor.aio_post_process_blocks(self.executor, blocks)
             else:
                 with langfuse.start_as_current_span(name="layout-dotsocr-detection"):
                     blocks = await self._do_layout_detect(
@@ -674,20 +628,13 @@ class DotsOCRClient:
 
                     if block_images:
                         contents = await gather_tasks(
-                            tasks=[
-                                self._do_content_extract(
-                                    img, "text", priority, semaphore
-                                )
-                                for img in block_images
-                            ],
+                            tasks=[self._do_content_extract(img, "text", priority, semaphore) for img in block_images],
                             use_tqdm=False,
                         )
                         for idx, content in zip(block_indices, contents):
                             blocks[idx].content = content
 
-                    return await self.postprocessor.aio_post_process_blocks(
-                        self.executor, blocks
-                    )
+                    return await self.postprocessor.aio_post_process_blocks(self.executor, blocks)
         else:
             return await self._do_two_step_extract(image, priority, semaphore)
 
@@ -715,9 +662,7 @@ class DotsOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_two_step_extract(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_two_step_extract(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,

@@ -81,9 +81,7 @@ class HunyuanOCRClient:
         use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
-            raise ValueError(
-                f"Unsupported backend: {backend}. Only 'http-client' is supported."
-            )
+            raise ValueError(f"Unsupported backend: {backend}. Only 'http-client' is supported.")
 
         self._settings = settings
 
@@ -147,14 +145,10 @@ class HunyuanOCRClient:
         prompt = self.prompts.get(type) or self.prompt
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                image_bytes, prompt, self.sampling_params, priority
-            )
+            output = await self.client.aio_predict(image_bytes, prompt, self.sampling_params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    image_bytes, prompt, self.sampling_params, priority
-                )
+                output = await self.client.aio_predict(image_bytes, prompt, self.sampling_params, priority)
 
         # Post-process output
         if output:
@@ -188,14 +182,10 @@ class HunyuanOCRClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="ocr-hunyuan-extraction"):
-                        return await self._do_content_extract(
-                            image, type, priority, semaphore
-                        )
+                        return await self._do_content_extract(image, type, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-hunyuan-extraction"):
-                    return await self._do_content_extract(
-                        image, type, priority, semaphore
-                    )
+                    return await self._do_content_extract(image, type, priority, semaphore)
         else:
             return await self._do_content_extract(image, type, priority, semaphore)
 
@@ -227,9 +217,7 @@ class HunyuanOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(
-                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_content_extract(img, t, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -258,14 +246,10 @@ class HunyuanOCRClient:
         image_bytes = get_png_bytes(image)
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                image_bytes, self.prompt, self.sampling_params, priority
-            )
+            output = await self.client.aio_predict(image_bytes, self.prompt, self.sampling_params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    image_bytes, self.prompt, self.sampling_params, priority
-                )
+                output = await self.client.aio_predict(image_bytes, self.prompt, self.sampling_params, priority)
 
         # Parse output into ContentBlocks
         blocks = await self.postprocessor.aio_parse_layout_output(
@@ -305,14 +289,10 @@ class HunyuanOCRClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="ocr-hunyuan-extraction"):
-                        return await self._do_full_page_ocr(
-                            image, page_image, priority, semaphore
-                        )
+                        return await self._do_full_page_ocr(image, page_image, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-hunyuan-extraction"):
-                    return await self._do_full_page_ocr(
-                        image, page_image, priority, semaphore
-                    )
+                    return await self._do_full_page_ocr(image, page_image, priority, semaphore)
         else:
             return await self._do_full_page_ocr(image, page_image, priority, semaphore)
 
@@ -351,9 +331,7 @@ class HunyuanOCRClient:
                     semaphore,
                     page_idx=idx if total_pages > 1 else None,
                 )
-                for idx, (img, page_img, p) in enumerate(
-                    zip(images, page_images, priority)
-                )
+                for idx, (img, page_img, p) in enumerate(zip(images, page_images, priority))
             ],
             use_tqdm=self.use_tqdm,
             tqdm_desc="Hunyuan Full-Page OCR",

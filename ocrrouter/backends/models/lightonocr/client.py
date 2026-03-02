@@ -82,9 +82,7 @@ class LightOnOCRClient:
         use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
-            raise ValueError(
-                f"Unsupported backend: {backend}. Only 'http-client' is supported."
-            )
+            raise ValueError(f"Unsupported backend: {backend}. Only 'http-client' is supported.")
 
         self._settings = settings
 
@@ -139,22 +137,16 @@ class LightOnOCRClient:
             List of ContentBlock with type, bbox, and content.
         """
         # Preprocess image
-        layout_image = await self.preprocessor.aio_prepare_for_layout(
-            self.executor, image
-        )
+        layout_image = await self.preprocessor.aio_prepare_for_layout(self.executor, image)
 
         prompt = self.prompts.get("[default]", "")
         params = self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                layout_image, prompt, params, priority
-            )
+            output = await self.client.aio_predict(layout_image, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    layout_image, prompt, params, priority
-                )
+                output = await self.client.aio_predict(layout_image, prompt, params, priority)
 
         return await self.postprocessor.aio_parse_layout_output(
             self.executor,
@@ -189,17 +181,11 @@ class LightOnOCRClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="layout-lightonocr-detection"
-                    ):
-                        return await self._do_layout_detect(
-                            image, output_mode, priority, semaphore
-                        )
+                    with langfuse.start_as_current_span(name="layout-lightonocr-detection"):
+                        return await self._do_layout_detect(image, output_mode, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="layout-lightonocr-detection"):
-                    return await self._do_layout_detect(
-                        image, output_mode, priority, semaphore
-                    )
+                    return await self._do_layout_detect(image, output_mode, priority, semaphore)
         else:
             return await self._do_layout_detect(image, output_mode, priority, semaphore)
 
@@ -265,14 +251,10 @@ class LightOnOCRClient:
         params = self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                image_bytes, prompt, params, priority
-            )
+            output = await self.client.aio_predict(image_bytes, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    image_bytes, prompt, params, priority
-                )
+                output = await self.client.aio_predict(image_bytes, prompt, params, priority)
 
         return output.strip() if output else None
 
@@ -301,12 +283,8 @@ class LightOnOCRClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="ocr-lightonocr-extraction"
-                    ):
-                        return await self._do_content_extract(
-                            image, priority, semaphore
-                        )
+                    with langfuse.start_as_current_span(name="ocr-lightonocr-extraction"):
+                        return await self._do_content_extract(image, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-lightonocr-extraction"):
                     return await self._do_content_extract(image, priority, semaphore)
@@ -341,9 +319,7 @@ class LightOnOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(
-                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_content_extract(img, t, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -399,21 +375,13 @@ class LightOnOCRClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="ocr-lightonocr-with-layout"
-                    ):
-                        return await self._do_ocr_with_layout(
-                            image, output_mode, priority, semaphore
-                        )
+                    with langfuse.start_as_current_span(name="ocr-lightonocr-with-layout"):
+                        return await self._do_ocr_with_layout(image, output_mode, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-lightonocr-with-layout"):
-                    return await self._do_ocr_with_layout(
-                        image, output_mode, priority, semaphore
-                    )
+                    return await self._do_ocr_with_layout(image, output_mode, priority, semaphore)
         else:
-            return await self._do_ocr_with_layout(
-                image, output_mode, priority, semaphore
-            )
+            return await self._do_ocr_with_layout(image, output_mode, priority, semaphore)
 
     async def aio_batch_ocr_with_layout(
         self,

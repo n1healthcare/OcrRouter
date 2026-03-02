@@ -60,14 +60,11 @@ def main():
     settings = Settings(
         # Backend selection (deepseek is fast and accurate for general documents)
         backend="deepseek",
-
         # API configuration
         openai_base_url=openai_base_url,
         openai_api_key=openai_api_key,
-
         # Output mode: "all" = layout detection + OCR
         output_mode="all",
-
         # Logging level
         log_level="INFO",
     )
@@ -91,7 +88,7 @@ def main():
         print(f"\nOutput directory: {result['output_dir']}")
 
         print("\nGenerated files:")
-        output_path = Path(result['output_dir'])
+        output_path = Path(result["output_dir"])
         for file in sorted(output_path.glob("*")):
             print(f"  - {file.name}")
 

@@ -40,13 +40,9 @@ def pdf_page_to_image(page: pdfium.PdfPage, dpi=200, image_type=ImageType.PIL) -
     return image_dict
 
 
-def _load_images_from_pdf_worker(
-    pdf_bytes, dpi, start_page_id, end_page_id, image_type
-):
+def _load_images_from_pdf_worker(pdf_bytes, dpi, start_page_id, end_page_id, image_type):
     """用于进程池的包装函数"""
-    return load_images_from_pdf_core(
-        pdf_bytes, dpi, start_page_id, end_page_id, image_type
-    )
+    return load_images_from_pdf_core(pdf_bytes, dpi, start_page_id, end_page_id, image_type)
 
 
 def load_images_from_pdf(

@@ -67,28 +67,12 @@ class OutputHandler:
         output_mode = output_mode or self._settings.output_mode
 
         # Apply settings defaults
-        draw_layout = (
-            draw_layout if draw_layout is not None else self._settings.draw_layout_bbox
-        )
+        draw_layout = draw_layout if draw_layout is not None else self._settings.draw_layout_bbox
         dump_md = dump_md if dump_md is not None else self._settings.dump_md
-        dump_middle_json = (
-            dump_middle_json
-            if dump_middle_json is not None
-            else self._settings.dump_middle_json
-        )
-        dump_model_output = (
-            dump_model_output
-            if dump_model_output is not None
-            else self._settings.dump_model_output
-        )
-        dump_orig_pdf = (
-            dump_orig_pdf if dump_orig_pdf is not None else self._settings.dump_orig_pdf
-        )
-        dump_content_list = (
-            dump_content_list
-            if dump_content_list is not None
-            else self._settings.dump_content_list
-        )
+        dump_middle_json = dump_middle_json if dump_middle_json is not None else self._settings.dump_middle_json
+        dump_model_output = dump_model_output if dump_model_output is not None else self._settings.dump_model_output
+        dump_orig_pdf = dump_orig_pdf if dump_orig_pdf is not None else self._settings.dump_orig_pdf
+        dump_content_list = dump_content_list if dump_content_list is not None else self._settings.dump_content_list
 
         # Override flags based on output_mode
         if output_mode == "layout_only":
@@ -108,9 +92,7 @@ class OutputHandler:
 
         # Draw layout bounding boxes
         if draw_layout:
-            draw_layout_bbox(
-                pdf_info, pdf_bytes, output_dir, f"{pdf_file_name}_layout.pdf"
-            )
+            draw_layout_bbox(pdf_info, pdf_bytes, output_dir, f"{pdf_file_name}_layout.pdf")
 
         # Save original PDF
         if dump_orig_pdf:
@@ -125,9 +107,7 @@ class OutputHandler:
             if formatted_output.get("content_list"):
                 md_writer.write_string(
                     f"{pdf_file_name}_content_list.json",
-                    json.dumps(
-                        formatted_output["content_list"], ensure_ascii=False, indent=4
-                    ),
+                    json.dumps(formatted_output["content_list"], ensure_ascii=False, indent=4),
                 )
             if formatted_output.get("content_list_v2"):
                 md_writer.write_string(

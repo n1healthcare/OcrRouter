@@ -106,9 +106,7 @@ class LightOnOCRBackend(BaseModelBackend):
         elif output_mode == "ocr_only":
             # Full-page OCR - skip layout detection
             logger.debug("Running full-page OCR only (ocr_only mode)")
-            ocr_texts = await self.client.aio_batch_content_extract(
-                images=images_pil_list
-            )
+            ocr_texts = await self.client.aio_batch_content_extract(images=images_pil_list)
             # Convert OCR texts to full-page ContentBlocks
             # Strip image markers since LightOnOCR outputs them by default
             results = []

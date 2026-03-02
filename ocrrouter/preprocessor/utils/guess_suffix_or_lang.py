@@ -34,7 +34,5 @@ def guess_suffix_by_path(file_path) -> str:
                 if f.read(4) == PDF_SIG_BYTES:
                     suffix = "pdf"
         except Exception as e:
-            logger.warning(
-                f"Failed to read file {file_path} for PDF signature check: {e}"
-            )
+            logger.warning(f"Failed to read file {file_path} for PDF signature check: {e}")
     return suffix

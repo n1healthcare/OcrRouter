@@ -1,6 +1,7 @@
 """
 包含两个MagicModel类中重复使用的方法和逻辑
 """
+
 from collections.abc import Callable
 from typing import Any
 
@@ -23,16 +24,16 @@ def reduct_overlap(bboxes: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for j in range(N):
             if i == j:
                 continue
-            if is_in(bboxes[i]['bbox'], bboxes[j]['bbox']):
+            if is_in(bboxes[i]["bbox"], bboxes[j]["bbox"]):
                 keep[i] = False
     return [bboxes[i] for i in range(N) if keep[i]]
 
 
 def tie_up_category_by_distance_v3(
-        get_subjects_func: Callable,
-        get_objects_func: Callable,
-        extract_subject_func: Callable = None,
-        extract_object_func: Callable = None
+    get_subjects_func: Callable,
+    get_objects_func: Callable,
+    extract_subject_func: Callable = None,
+    extract_object_func: Callable = None,
 ):
     """
     通用的类别关联方法，用于将主体对象与客体对象进行关联
@@ -84,10 +85,14 @@ def tie_up_category_by_distance_v3(
         candidates.sort(key=lambda x: (x[2] - left_x) ** 2 + (x[3] - top_y) ** 2)
 
         fst_idx, fst_kind, left_x, top_y = candidates[0]
-        fst_bbox = subjects[fst_idx]['bbox'] if fst_kind == SUB_BIT_KIND else objects[fst_idx - OBJ_IDX_OFFSET]['bbox']
+        fst_bbox = subjects[fst_idx]["bbox"] if fst_kind == SUB_BIT_KIND else objects[fst_idx - OBJ_IDX_OFFSET]["bbox"]
         candidates.sort(
-            key=lambda x: bbox_distance(fst_bbox, subjects[x[0]]['bbox']) if x[1] == SUB_BIT_KIND else bbox_distance(
-                fst_bbox, objects[x[0] - OBJ_IDX_OFFSET]['bbox']))
+            key=lambda x: (
+                bbox_distance(fst_bbox, subjects[x[0]]["bbox"])
+                if x[1] == SUB_BIT_KIND
+                else bbox_distance(fst_bbox, objects[x[0] - OBJ_IDX_OFFSET]["bbox"])
+            )
+        )
         nxt = None
 
         for i in range(1, len(candidates)):

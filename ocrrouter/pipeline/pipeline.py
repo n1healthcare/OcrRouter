@@ -79,9 +79,7 @@ class DocumentPipeline:
         else:
             # Apply overrides on top of provided settings with validation
             if overrides:
-                self._settings = Settings.model_validate(
-                    {**settings.model_dump(), **overrides}
-                )
+                self._settings = Settings.model_validate({**settings.model_dump(), **overrides})
             else:
                 self._settings = settings
 
@@ -160,9 +158,7 @@ class DocumentPipeline:
             pdf_file_name = filename
             logger.debug(f"Reading input from bytes: {pdf_file_name}")
         else:
-            input_path = (
-                Path(input_data) if not isinstance(input_data, Path) else input_data
-            )
+            input_path = Path(input_data) if not isinstance(input_data, Path) else input_data
             pdf_file_name = filename if filename is not None else input_path.stem
             logger.debug(f"Reading input: {input_path}")
 

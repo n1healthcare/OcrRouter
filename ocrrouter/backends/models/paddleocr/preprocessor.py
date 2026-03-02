@@ -51,9 +51,7 @@ def smart_resize(
         Tuple of (new_height, new_width)
     """
     if max(height, width) / min(height, width) > 200:
-        raise ValueError(
-            f"Aspect ratio must be smaller than 200, got {max(height, width) / min(height, width)}"
-        )
+        raise ValueError(f"Aspect ratio must be smaller than 200, got {max(height, width) / min(height, width)}")
 
     h_bar = max(factor, round_by_factor(height, factor))
     w_bar = max(factor, round_by_factor(width, factor))
@@ -109,8 +107,7 @@ class PaddleOCRPreprocessor(BasePreprocessor):
             NotImplementedError: Always, as PaddleOCR only supports OCR.
         """
         raise NotImplementedError(
-            "PaddleOCR does not support layout detection. "
-            "Use prepare_for_ocr() for OCR extraction."
+            "PaddleOCR does not support layout detection. Use prepare_for_ocr() for OCR extraction."
         )
 
     def prepare_for_ocr(
@@ -156,8 +153,6 @@ class PaddleOCRPreprocessor(BasePreprocessor):
 
         # Resize if needed
         if (resized_width, resized_height) != (width, height):
-            image = image.resize(
-                (resized_width, resized_height), Image.Resampling.BICUBIC
-            )
+            image = image.resize((resized_width, resized_height), Image.Resampling.BICUBIC)
 
         return get_png_bytes(image)

@@ -1,6 +1,5 @@
 """Converter utilities for transforming model outputs to middle JSON format."""
 
-
 from ocrrouter.postprocessor.utils.table_merge import merge_table
 from ocrrouter.processing.magic_model import MagicModel
 from ocrrouter.processing.utils.cut_image import cut_image_and_table
@@ -9,9 +8,7 @@ from ocrrouter.utils.hash_utils import bytes_md5
 from ocrrouter.version import __version__
 
 
-def blocks_to_page_info(
-    page_blocks, image_dict, page, image_writer, page_index
-) -> dict:
+def blocks_to_page_info(page_blocks, image_dict, page, image_writer, page_index) -> dict:
     """Convert blocks to page information dictionary.
 
     Args:
@@ -50,9 +47,7 @@ def blocks_to_page_info(
             ContentType.TABLE,
             ContentType.INTERLINE_EQUATION,
         ]:
-            span = cut_image_and_table(
-                span, page_pil_img, page_img_md5, page_index, image_writer, scale=scale
-            )
+            span = cut_image_and_table(span, page_pil_img, page_img_md5, page_index, image_writer, scale=scale)
 
     page_blocks = []
     page_blocks.extend(
@@ -108,9 +103,7 @@ def result_to_middle_json(
     for index, page_blocks in enumerate(model_output_blocks_list):
         page = pdf_doc[index]
         image_dict = images_list[index]
-        page_info = blocks_to_page_info(
-            page_blocks, image_dict, page, image_writer, index
-        )
+        page_info = blocks_to_page_info(page_blocks, image_dict, page, image_writer, index)
         middle_json["pdf_info"].append(page_info)
 
     # Cross-page table merge

@@ -49,6 +49,5 @@ class PPDocLayoutPreprocessor(BasePreprocessor):
             Empty bytes (not used).
         """
         raise NotImplementedError(
-            "PP-DocLayoutV3 is a layout detection model only. "
-            "Use a different backend for OCR extraction."
+            "PP-DocLayoutV3 is a layout detection model only. Use a different backend for OCR extraction."
         )

@@ -42,9 +42,7 @@ def create_langfuse_client():
     secret_key = os.getenv("LANGFUSE_SECRET_KEY")
 
     if not public_key or not secret_key:
-        logger.debug(
-            "Langfuse not configured (missing LANGFUSE_PUBLIC_KEY or LANGFUSE_SECRET_KEY)"
-        )
+        logger.debug("Langfuse not configured (missing LANGFUSE_PUBLIC_KEY or LANGFUSE_SECRET_KEY)")
         return None
 
     try:
@@ -131,9 +129,7 @@ async def parse_documents(
             try:
                 logger.info(f"Processing: {path}")
                 result = await pipeline.aio_process(str(path), output_dir)
-                logger.info(
-                    f"Completed: {path} -> {result.get('output_dir', output_dir)}"
-                )
+                logger.info(f"Completed: {path} -> {result.get('output_dir', output_dir)}")
                 return result
             except Exception as e:
                 logger.exception(f"Failed to process {path}: {e}")

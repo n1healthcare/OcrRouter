@@ -191,9 +191,7 @@ async def gather_tasks(
     outputs: list[tuple[int, T]] = []
     with tqdm(total=len(tasks), desc=tqdm_desc, disable=not use_tqdm) as pbar:
         while len(pending) > 0:
-            done, pending = await asyncio.wait(
-                pending, return_when=asyncio.FIRST_COMPLETED
-            )
+            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
             outputs.extend(done_task.result() for done_task in done)
             pbar.update(len(done))
 

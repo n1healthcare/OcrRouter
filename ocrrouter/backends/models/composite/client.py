@@ -43,8 +43,7 @@ class CompositeClient:
         self,
         settings: Settings,
         layout_model: Literal["mineru", "deepseek", "dotsocr", "ppdoclayout"] | None = None,
-        ocr_model: Literal["mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm", "glmocr"]
-        | None = None,
+        ocr_model: Literal["mineru", "deepseek", "dotsocr", "paddleocr", "generalvlm", "glmocr"] | None = None,
         executor: Executor | None = None,
         use_tqdm: bool | None = None,
     ) -> None:
@@ -64,9 +63,7 @@ class CompositeClient:
             use_tqdm = settings.use_tqdm
 
         # Use settings values if not explicitly provided
-        layout_model = (
-            layout_model if layout_model is not None else settings.layout_model
-        )
+        layout_model = layout_model if layout_model is not None else settings.layout_model
         ocr_model = ocr_model if ocr_model is not None else settings.ocr_model
 
         self.layout_model = layout_model
@@ -206,9 +203,7 @@ class CompositeClient:
         Returns:
             List of ContentBlock lists, one per image
         """
-        return await self.layout_client.aio_batch_layout_detect(
-            images, priority, semaphore
-        )
+        return await self.layout_client.aio_batch_layout_detect(images, priority, semaphore)
 
     async def aio_content_extract(
         self,
@@ -230,9 +225,7 @@ class CompositeClient:
         Returns:
             Extracted text content, or None on failure
         """
-        return await self.ocr_client.aio_content_extract(
-            image, type, priority, semaphore
-        )
+        return await self.ocr_client.aio_content_extract(image, type, priority, semaphore)
 
     async def aio_batch_content_extract(
         self,
@@ -252,9 +245,7 @@ class CompositeClient:
         Returns:
             List of extracted text content
         """
-        return await self.ocr_client.aio_batch_content_extract(
-            images, types, priority, semaphore
-        )
+        return await self.ocr_client.aio_batch_content_extract(images, types, priority, semaphore)
 
     async def _do_two_step_extract(
         self,
@@ -357,12 +348,8 @@ class CompositeClient:
 
         if langfuse and page_idx is not None:
             with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                with langfuse.start_as_current_span(
-                    name=f"layout-{self.layout_model}-detection"
-                ):
-                    blocks = await self.layout_client._do_layout_detect(
-                        image, priority, semaphore
-                    )
+                with langfuse.start_as_current_span(name=f"layout-{self.layout_model}-detection"):
+                    blocks = await self.layout_client._do_layout_detect(image, priority, semaphore)
 
                 if blocks is None:
                     raise RuntimeError("Layout detection failed for the page")
@@ -370,9 +357,7 @@ class CompositeClient:
                 if not blocks:
                     return blocks
 
-                with langfuse.start_as_current_span(
-                    name=f"ocr-{self.ocr_model}-extraction"
-                ):
+                with langfuse.start_as_current_span(name=f"ocr-{self.ocr_model}-extraction"):
                     image = get_rgb_image(image)
                     width, height = image.size
 
@@ -402,9 +387,7 @@ class CompositeClient:
                     if block_images:
                         contents = await gather_tasks(
                             tasks=[
-                                self.ocr_client._do_content_extract(
-                                    img, t, priority, semaphore
-                                )
+                                self.ocr_client._do_content_extract(img, t, priority, semaphore)
                                 for img, t in zip(block_images, block_types)
                             ],
                             use_tqdm=False,
@@ -441,9 +424,7 @@ class CompositeClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_two_step_extract(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_two_step_extract(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,

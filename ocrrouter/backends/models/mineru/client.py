@@ -138,22 +138,14 @@ class MinerUClient:
         Returns:
             List of ContentBlock with type and bbox
         """
-        layout_image = await self.preprocessor.aio_prepare_for_layout(
-            self.executor, image
-        )
+        layout_image = await self.preprocessor.aio_prepare_for_layout(self.executor, image)
         prompt = self.prompts.get("[layout]") or self.prompts["[default]"]
-        params = self.sampling_params.get("[layout]") or self.sampling_params.get(
-            "[default]"
-        )
+        params = self.sampling_params.get("[layout]") or self.sampling_params.get("[default]")
         if semaphore is None:
-            output = await self.client.aio_predict(
-                layout_image, prompt, params, priority
-            )
+            output = await self.client.aio_predict(layout_image, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    layout_image, prompt, params, priority
-                )
+                output = await self.client.aio_predict(layout_image, prompt, params, priority)
         return await self.postprocessor.aio_parse_layout_output(self.executor, output)
 
     async def aio_layout_detect(
@@ -212,9 +204,7 @@ class MinerUClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_layout_detect(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_layout_detect(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -247,14 +237,10 @@ class MinerUClient:
         if not (block_images and prompts and params):
             return None
         if semaphore is None:
-            output = await self.client.aio_predict(
-                block_images[0], prompts[0], params[0], priority
-            )
+            output = await self.client.aio_predict(block_images[0], prompts[0], params[0], priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    block_images[0], prompts[0], params[0], priority
-                )
+                output = await self.client.aio_predict(block_images[0], prompts[0], params[0], priority)
         blocks[0].content = output
         blocks = await self.postprocessor.aio_post_process_blocks(self.executor, blocks)
         return blocks[0].content if blocks else None
@@ -285,14 +271,10 @@ class MinerUClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
-                        return await self._do_content_extract(
-                            image, type, priority, semaphore
-                        )
+                        return await self._do_content_extract(image, type, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
-                    return await self._do_content_extract(
-                        image, type, priority, semaphore
-                    )
+                    return await self._do_content_extract(image, type, priority, semaphore)
         else:
             return await self._do_content_extract(image, type, priority, semaphore)
 
@@ -327,9 +309,7 @@ class MinerUClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(
-                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_content_extract(img, t, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -361,9 +341,7 @@ class MinerUClient:
             image,
             blocks,
         )
-        outputs = await self.client.aio_batch_predict(
-            block_images, prompts, params, priority, semaphore=semaphore
-        )
+        outputs = await self.client.aio_batch_predict(block_images, prompts, params, priority, semaphore=semaphore)
         for idx, output in zip(indices, outputs):
             blocks[idx].content = output
         return await self.postprocessor.aio_post_process_blocks(self.executor, blocks)
@@ -393,20 +371,14 @@ class MinerUClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="layout-mineru-detection"):
-                        blocks = await self._do_layout_detect(
-                            image, priority, semaphore
-                        )
+                        blocks = await self._do_layout_detect(image, priority, semaphore)
                     with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
-                        return await self._do_two_step_ocr(
-                            image, blocks, priority, semaphore
-                        )
+                        return await self._do_two_step_ocr(image, blocks, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="layout-mineru-detection"):
                     blocks = await self._do_layout_detect(image, priority, semaphore)
                 with langfuse.start_as_current_span(name="ocr-mineru-extraction"):
-                    return await self._do_two_step_ocr(
-                        image, blocks, priority, semaphore
-                    )
+                    return await self._do_two_step_ocr(image, blocks, priority, semaphore)
         else:
             blocks = await self._do_layout_detect(image, priority, semaphore)
             return await self._do_two_step_ocr(image, blocks, priority, semaphore)
@@ -425,9 +397,7 @@ class MinerUClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_two_step_extract(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_two_step_extract(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -452,17 +422,13 @@ class MinerUClient:
         all_indices: list[tuple[int, int]] = []
         prepared_inputs = await gather_tasks(
             tasks=[
-                loop.run_in_executor(
-                    self.executor, self.preprocessor.prepare_blocks_for_ocr, *args
-                )
+                loop.run_in_executor(self.executor, self.preprocessor.prepare_blocks_for_ocr, *args)
                 for args in zip(images, blocks_list)
             ],
             use_tqdm=self.use_tqdm,
             tqdm_desc="Extract Preparation",
         )
-        for img_idx, (block_images, prompts, params, indices) in enumerate(
-            prepared_inputs
-        ):
+        for img_idx, (block_images, prompts, params, indices) in enumerate(prepared_inputs):
             all_images.extend(block_images)
             all_prompts.extend(prompts)
             all_params.extend(params)
@@ -479,10 +445,7 @@ class MinerUClient:
         for (img_idx, idx), output in zip(all_indices, outputs):
             blocks_list[img_idx][idx].content = output
         return await gather_tasks(
-            tasks=[
-                self.postprocessor.aio_post_process_blocks(self.executor, blocks)
-                for blocks in blocks_list
-            ],
+            tasks=[self.postprocessor.aio_post_process_blocks(self.executor, blocks) for blocks in blocks_list],
             use_tqdm=self.use_tqdm,
             tqdm_desc="Post Processing",
         )
@@ -495,8 +458,6 @@ class MinerUClient:
     ) -> list[list[ContentBlock]]:
         semaphore = semaphore or asyncio.Semaphore(self.max_concurrency)
         if self.batching_mode == "concurrent":
-            return await self.aio_concurrent_two_step_extract(
-                images, priority, semaphore
-            )
+            return await self.aio_concurrent_two_step_extract(images, priority, semaphore)
         else:  # self.batching_mode == "stepping"
             return await self.aio_stepping_two_step_extract(images, priority, semaphore)

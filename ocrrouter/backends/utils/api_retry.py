@@ -146,9 +146,7 @@ def _create_should_retry_exception(
             return False
 
         # Check for HTTP status code (works with httpx, requests, etc.)
-        if hasattr(exception, "response") and hasattr(
-            exception.response, "status_code"
-        ):
+        if hasattr(exception, "response") and hasattr(exception.response, "status_code"):
             status_code = exception.response.status_code
 
             # Blocklist takes precedence
@@ -236,9 +234,7 @@ def api_retry(
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         # Build retry kwargs
         retry_kwargs = {
-            "stop": stop_after_attempt(
-                max_retries + 1
-            ),  # +1 because initial attempt counts
+            "stop": stop_after_attempt(max_retries + 1),  # +1 because initial attempt counts
             "wait": wait_exponential_full_jitter(
                 min_base=min_base,
                 max_base=max_base,

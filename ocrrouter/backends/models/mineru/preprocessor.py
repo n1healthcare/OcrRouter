@@ -57,9 +57,7 @@ class MinerUPreprocessor(BasePreprocessor):
             else:  # width < height
                 new_w, new_h = math.ceil(height / self.max_image_edge_ratio), height
             new_image = Image.new(image.mode, (new_w, new_h), (255, 255, 255))
-            new_image.paste(
-                image, (int((new_w - width) / 2), int((new_h - height) / 2))
-            )
+            new_image.paste(image, (int((new_w - width) / 2), int((new_h - height) / 2)))
             image = new_image
         if min(image.size) < self.min_image_edge:
             scale = self.min_image_edge / min(image.size)
@@ -156,9 +154,7 @@ class MinerUPreprocessor(BasePreprocessor):
             prompt = self.prompts.get(block.type) or self.prompts.get("[default]", "")
             block_prompts.append(prompt)
 
-            params = self.sampling_params.get(block.type) or self.sampling_params.get(
-                "[default]"
-            )
+            params = self.sampling_params.get(block.type) or self.sampling_params.get("[default]")
             block_params.append(params)
 
             indices.append(idx)

@@ -312,12 +312,14 @@ class PPDocLayoutPostprocessor(BasePostprocessor):
             order_seq = np.arange(len(scores))
 
         # Build boxes array: [cls_id, score, x1, y1, x2, y2, order]
-        boxes_array = np.column_stack([
-            labels,
-            scores,
-            boxes,
-            order_seq,
-        ])
+        boxes_array = np.column_stack(
+            [
+                labels,
+                scores,
+                boxes,
+                order_seq,
+            ]
+        )
 
         # Apply NMS
         if self.layout_nms and len(boxes_array) > 0:

@@ -106,11 +106,7 @@ def otsl_extract_tokens_and_text(s: str):
     # Pattern to match anything enclosed by < >
     # (including the angle brackets themselves)
     # pattern = r"(<[^>]+>)"
-    pattern = (
-        r"("
-        + r"|".join([OTSL_NL, OTSL_FCEL, OTSL_ECEL, OTSL_LCEL, OTSL_UCEL, OTSL_XCEL])
-        + r")"
-    )
+    pattern = r"(" + r"|".join([OTSL_NL, OTSL_FCEL, OTSL_ECEL, OTSL_LCEL, OTSL_UCEL, OTSL_XCEL]) + r")"
     # Find all tokens (e.g. "<otsl>", "<loc_140>", etc.)
     tokens = re.findall(pattern, s)
     # Remove any tokens that start with "<loc_"
@@ -126,11 +122,7 @@ def otsl_extract_tokens_and_text(s: str):
 
 def otsl_parse_texts(texts, tokens):
     split_word = OTSL_NL
-    split_row_tokens = [
-        list(y)
-        for x, y in itertools.groupby(tokens, lambda z: z == split_word)
-        if not x
-    ]
+    split_row_tokens = [list(y) for x, y in itertools.groupby(tokens, lambda z: z == split_word) if not x]
     table_cells = []
     r_idx = 0
     c_idx = 0
@@ -204,8 +196,7 @@ def otsl_parse_texts(texts, tokens):
             col_span = 1
             right_offset = 1
             if text != OTSL_ECEL and (
-                texts[i + 1]
-                not in [OTSL_NL, OTSL_FCEL, OTSL_ECEL, OTSL_LCEL, OTSL_UCEL, OTSL_XCEL]
+                texts[i + 1] not in [OTSL_NL, OTSL_FCEL, OTSL_ECEL, OTSL_LCEL, OTSL_UCEL, OTSL_XCEL]
             ):
                 cell_text = texts[i + 1]
                 right_offset = 2

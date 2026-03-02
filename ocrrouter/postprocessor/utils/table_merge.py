@@ -171,29 +171,20 @@ def can_merge_tables(current_table_block, previous_table_block):
     """判断两个表格是否可以合并"""
     # 检查表格是否有caption和footnote
     # 如果有TABLE_CAPTION类型的块,检查是否至少有一个以"(续)"结尾
-    caption_blocks = [
-        block
-        for block in current_table_block["blocks"]
-        if block["type"] == BlockType.TABLE_CAPTION
-    ]
+    caption_blocks = [block for block in current_table_block["blocks"] if block["type"] == BlockType.TABLE_CAPTION]
     if caption_blocks:
         # 如果所有caption都不以"(续)"、"(续表)"、"(continued)"或"(cont.)"结尾,则不合并
 
         if not any(
             any(
-                full_to_half(merge_para_with_text(block).strip())
-                .lower()
-                .endswith(marker.lower())
+                full_to_half(merge_para_with_text(block).strip()).lower().endswith(marker.lower())
                 for marker in CONTINUATION_MARKERS
             )
             for block in caption_blocks
         ):
             return False, None, None, None, None
 
-    if any(
-        block["type"] == BlockType.TABLE_FOOTNOTE
-        for block in previous_table_block["blocks"]
-    ):
+    if any(block["type"] == BlockType.TABLE_FOOTNOTE for block in previous_table_block["blocks"]):
         return False, None, None, None, None
 
     # 获取两个表格的HTML内容
@@ -201,19 +192,11 @@ def can_merge_tables(current_table_block, previous_table_block):
     previous_html = ""
 
     for block in current_table_block["blocks"]:
-        if (
-            block["type"] == BlockType.TABLE_BODY
-            and block["lines"]
-            and block["lines"][0]["spans"]
-        ):
+        if block["type"] == BlockType.TABLE_BODY and block["lines"] and block["lines"][0]["spans"]:
             current_html = block["lines"][0]["spans"][0].get("html", "")
 
     for block in previous_table_block["blocks"]:
-        if (
-            block["type"] == BlockType.TABLE_BODY
-            and block["lines"]
-            and block["lines"][0]["spans"]
-        ):
+        if block["type"] == BlockType.TABLE_BODY and block["lines"] and block["lines"][0]["spans"]:
             previous_html = block["lines"][0]["spans"][0].get("html", "")
 
     if not current_html or not previous_html:
@@ -279,9 +262,7 @@ def check_rows_match(soup1, soup2):
     # logger.debug(f"行列数 - 前表最后一行: {last_row_cols}(视觉列数:{last_row_visual_cols}), 当前表首行: {first_row_cols}(视觉列数:{first_row_visual_cols})")
 
     # 同时考虑实际列数匹配和视觉列数匹配
-    return (
-        last_row_cols == first_row_cols or last_row_visual_cols == first_row_visual_cols
-    )
+    return last_row_cols == first_row_cols or last_row_visual_cols == first_row_visual_cols
 
 
 def check_row_columns_match(row1, row2):
@@ -331,9 +312,7 @@ def adjust_table_rows_colspan(
             continue
 
         # 检查是否与参考行结构匹配
-        if calculate_visual_columns(
-            row
-        ) == reference_visual_cols and check_row_columns_match(row, reference_row):
+        if calculate_visual_columns(row) == reference_visual_cols and check_row_columns_match(row, reference_row):
             # 尝试应用参考结构
             if len(cells) <= len(reference_structure):
                 for j, cell in enumerate(cells):
@@ -369,9 +348,7 @@ def perform_table_merge(soup1, soup2, previous_table_block, wait_merge_table_foo
         table_cols1 = calculate_table_total_columns(soup1)
         table_cols2 = calculate_table_total_columns(soup2)
         if table_cols1 >= table_cols2:
-            reference_structure = [
-                int(cell.get("colspan", 1)) for cell in last_row1.find_all(["td", "th"])
-            ]
+            reference_structure = [int(cell.get("colspan", 1)) for cell in last_row1.find_all(["td", "th"])]
             reference_visual_cols = calculate_visual_columns(last_row1)
             # 以表1的最后一行为参考，调整表2的行
             adjust_table_rows_colspan(
@@ -386,10 +363,7 @@ def perform_table_merge(soup1, soup2, previous_table_block, wait_merge_table_foo
             )
 
         else:  # table_cols2 > table_cols1
-            reference_structure = [
-                int(cell.get("colspan", 1))
-                for cell in first_data_row2.find_all(["td", "th"])
-            ]
+            reference_structure = [int(cell.get("colspan", 1)) for cell in first_data_row2.find_all(["td", "th"])]
             reference_visual_cols = calculate_visual_columns(first_data_row2)
             # 以表2的第一个数据行为参考，调整表1的行
             adjust_table_rows_colspan(
@@ -433,28 +407,20 @@ def merge_table(page_info_list):
         previous_page_info = page_info_list[page_idx - 1]
 
         # 检查当前页是否有表格块
-        if not (
-            page_info["para_blocks"]
-            and page_info["para_blocks"][0]["type"] == BlockType.TABLE
-        ):
+        if not (page_info["para_blocks"] and page_info["para_blocks"][0]["type"] == BlockType.TABLE):
             continue
 
         current_table_block = page_info["para_blocks"][0]
 
         # 检查上一页是否有表格块
-        if not (
-            previous_page_info["para_blocks"]
-            and previous_page_info["para_blocks"][-1]["type"] == BlockType.TABLE
-        ):
+        if not (previous_page_info["para_blocks"] and previous_page_info["para_blocks"][-1]["type"] == BlockType.TABLE):
             continue
 
         previous_table_block = previous_page_info["para_blocks"][-1]
 
         # 收集待合并表格的footnote
         wait_merge_table_footnotes = [
-            block
-            for block in current_table_block["blocks"]
-            if block["type"] == BlockType.TABLE_FOOTNOTE
+            block for block in current_table_block["blocks"] if block["type"] == BlockType.TABLE_FOOTNOTE
         ]
 
         # 检查两个表格是否可以合并
@@ -466,17 +432,11 @@ def merge_table(page_info_list):
             continue
 
         # 执行表格合并
-        merged_html = perform_table_merge(
-            soup1, soup2, previous_table_block, wait_merge_table_footnotes
-        )
+        merged_html = perform_table_merge(soup1, soup2, previous_table_block, wait_merge_table_footnotes)
 
         # 更新previous_table_block的html
         for block in previous_table_block["blocks"]:
-            if (
-                block["type"] == BlockType.TABLE_BODY
-                and block["lines"]
-                and block["lines"][0]["spans"]
-            ):
+            if block["type"] == BlockType.TABLE_BODY and block["lines"] and block["lines"][0]["spans"]:
                 block["lines"][0]["spans"][0]["html"] = merged_html
                 break
 

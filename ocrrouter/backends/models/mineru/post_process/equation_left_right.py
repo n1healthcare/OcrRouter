@@ -159,7 +159,6 @@ def tag_element(node_list, array_list):
     node_tag_all_arr = []
     # from top to bottom
     for arr_idx in range(len(array_list)):
-
         contain_arr_tag = array_list[arr_idx][-1]
         node_list_cur_arr = [node for node in node_list]
         node_tag_cur_arr = [None for node in node_list]

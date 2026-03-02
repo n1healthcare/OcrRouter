@@ -7,9 +7,7 @@ from ocrrouter.backends.utils import BlockType
 # Regex pattern for parsing image bboxes in LightOnOCR output
 # Format: ![image](image_N.png) x1,y1,x2,y2
 # Where coordinates are normalized to 0-1000
-IMAGE_BBOX_PATTERN = re.compile(
-    r"!\[image\]\(image_(\d+)\.png\)\s*(\d+),(\d+),(\d+),(\d+)"
-)
+IMAGE_BBOX_PATTERN = re.compile(r"!\[image\]\(image_(\d+)\.png\)\s*(\d+),(\d+),(\d+),(\d+)")
 
 
 def parse_image_bboxes(text: str) -> list[tuple[int, list[float]]]:

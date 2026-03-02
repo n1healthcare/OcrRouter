@@ -18,9 +18,7 @@ def merge_para_with_text(para_block, formula_enable=True, img_buket_path=""):
             if span_type == ContentType.TEXT:
                 content = span["content"]
             elif span_type == ContentType.INLINE_EQUATION:
-                content = (
-                    f"{INLINE_LEFT_DELIMITER}{span['content']}{INLINE_RIGHT_DELIMITER}"
-                )
+                content = f"{INLINE_LEFT_DELIMITER}{span['content']}{INLINE_RIGHT_DELIMITER}"
             elif span_type == ContentType.INTERLINE_EQUATION:
                 if formula_enable:
                     content = f"\n{DISPLAY_LEFT_DELIMITER}\n{span['content']}\n{DISPLAY_RIGHT_DELIMITER}\n"
@@ -39,9 +37,7 @@ def merge_para_with_text(para_block, formula_enable=True, img_buket_path=""):
     return para_text
 
 
-def mk_blocks_to_markdown(
-    para_blocks, make_mode, formula_enable, table_enable, img_buket_path=""
-):
+def mk_blocks_to_markdown(para_blocks, make_mode, formula_enable, table_enable, img_buket_path=""):
     page_markdown = []
     for para_block in para_blocks:
         para_text = ""
@@ -52,14 +48,10 @@ def mk_blocks_to_markdown(
             BlockType.PHONETIC,
             BlockType.REF_TEXT,
         ]:
-            para_text = merge_para_with_text(
-                para_block, formula_enable=formula_enable, img_buket_path=img_buket_path
-            )
+            para_text = merge_para_with_text(para_block, formula_enable=formula_enable, img_buket_path=img_buket_path)
         elif para_type == BlockType.LIST:
             for block in para_block["blocks"]:
-                item_text = merge_para_with_text(
-                    block, formula_enable=formula_enable, img_buket_path=img_buket_path
-                )
+                item_text = merge_para_with_text(block, formula_enable=formula_enable, img_buket_path=img_buket_path)
                 para_text += f"{item_text}  \n"
         elif para_type == BlockType.TITLE:
             title_level = get_title_level(para_block)
@@ -69,10 +61,7 @@ def mk_blocks_to_markdown(
                 continue
             elif make_mode == MakeMode.MM_MD:
                 # 检测是否存在图片脚注
-                has_image_footnote = any(
-                    block["type"] == BlockType.IMAGE_FOOTNOTE
-                    for block in para_block["blocks"]
-                )
+                has_image_footnote = any(block["type"] == BlockType.IMAGE_FOOTNOTE for block in para_block["blocks"])
                 # 如果存在图片脚注，则将图片脚注拼接到图片正文后面
                 if has_image_footnote:
                     for block in para_block["blocks"]:  # 1st.拼image_caption
@@ -133,9 +122,7 @@ def mk_blocks_to_markdown(
                 if block["type"] == BlockType.CODE_BODY:
                     if sub_type == BlockType.CODE:
                         guess_lang = para_block["guess_lang"]
-                        para_text += (
-                            f"```{guess_lang}\n{merge_para_with_text(block)}\n```"
-                        )
+                        para_text += f"```{guess_lang}\n{merge_para_with_text(block)}\n```"
                     elif sub_type == BlockType.ALGORITHM:
                         para_text += merge_para_with_text(block)
 
@@ -202,17 +189,11 @@ def make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size)
                     for span in line["spans"]:
                         if span["type"] == ContentType.IMAGE:
                             if span.get("image_path", ""):
-                                para_content["img_path"] = (
-                                    f"{img_buket_path}/{span['image_path']}"
-                                )
+                                para_content["img_path"] = f"{img_buket_path}/{span['image_path']}"
             if block["type"] == BlockType.IMAGE_CAPTION:
-                para_content[BlockType.IMAGE_CAPTION].append(
-                    merge_para_with_text(block)
-                )
+                para_content[BlockType.IMAGE_CAPTION].append(merge_para_with_text(block))
             if block["type"] == BlockType.IMAGE_FOOTNOTE:
-                para_content[BlockType.IMAGE_FOOTNOTE].append(
-                    merge_para_with_text(block)
-                )
+                para_content[BlockType.IMAGE_FOOTNOTE].append(merge_para_with_text(block))
     elif para_type == BlockType.TABLE:
         para_content = {
             "type": ContentType.TABLE,
@@ -229,18 +210,12 @@ def make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size)
                                 para_content[BlockType.TABLE_BODY] = f"{span['html']}"
 
                             if span.get("image_path", ""):
-                                para_content["img_path"] = (
-                                    f"{img_buket_path}/{span['image_path']}"
-                                )
+                                para_content["img_path"] = f"{img_buket_path}/{span['image_path']}"
 
             if block["type"] == BlockType.TABLE_CAPTION:
-                para_content[BlockType.TABLE_CAPTION].append(
-                    merge_para_with_text(block)
-                )
+                para_content[BlockType.TABLE_CAPTION].append(merge_para_with_text(block))
             if block["type"] == BlockType.TABLE_FOOTNOTE:
-                para_content[BlockType.TABLE_FOOTNOTE].append(
-                    merge_para_with_text(block)
-                )
+                para_content[BlockType.TABLE_FOOTNOTE].append(merge_para_with_text(block))
     elif para_type == BlockType.CODE:
         para_content = {
             "type": BlockType.CODE,
@@ -522,10 +497,7 @@ def merge_para_with_text_v2(para_block):
             span_type = span.get("type")
             span_content = span.get("content")
             if span_content:
-                if (
-                    para_type == BlockType.PHONETIC
-                    and span_type == ContentTypeV2.SPAN_TEXT
-                ):
+                if para_type == BlockType.PHONETIC and span_type == ContentTypeV2.SPAN_TEXT:
                     span_type = ContentTypeV2.SPAN_PHONETIC
                 if span_type == ContentType.INLINE_EQUATION:
                     span_type = ContentTypeV2.SPAN_EQUATION_INLINE
@@ -542,9 +514,7 @@ def merge_para_with_text_v2(para_block):
                     }
                     para_content.append(span_item)
                 else:
-                    logger.warning(
-                        f"Unknown span type in merge_para_with_text_v2: {span_type}"
-                    )
+                    logger.warning(f"Unknown span type in merge_para_with_text_v2: {span_type}")
     return para_content
 
 
@@ -574,9 +544,7 @@ def union_make(
             if not para_blocks:
                 continue
             for para_block in para_blocks:
-                para_content = make_blocks_to_content_list(
-                    para_block, img_buket_path, page_idx, page_size
-                )
+                para_content = make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size)
                 output_content.append(para_content)
         elif make_mode == MakeMode.CONTENT_LIST_V2:
             # https://github.com/drunkpig/llm-webkit-mirror/blob/dev6/docs/specification/output_format/content_list_spec.md
@@ -585,9 +553,7 @@ def union_make(
             if not para_blocks:
                 continue
             for para_block in para_blocks:
-                para_content = make_blocks_to_content_list_v2(
-                    para_block, img_buket_path, page_size
-                )
+                para_content = make_blocks_to_content_list_v2(para_block, img_buket_path, page_size)
                 page_contents.append(para_content)
             output_content.append(page_contents)
 

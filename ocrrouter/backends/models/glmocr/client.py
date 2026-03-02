@@ -98,9 +98,7 @@ class GlmOCRClient:
         use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
-            raise ValueError(
-                f"Unsupported backend: {backend}. Only 'http-client' is supported."
-            )
+            raise ValueError(f"Unsupported backend: {backend}. Only 'http-client' is supported.")
 
         self._settings = settings
 
@@ -154,22 +152,16 @@ class GlmOCRClient:
             Extracted text content, or None on failure
         """
         # Prepare image
-        image_bytes = await self.preprocessor.aio_prepare_for_ocr(
-            self.executor, image, None
-        )
+        image_bytes = await self.preprocessor.aio_prepare_for_ocr(self.executor, image, None)
 
         prompt = self.prompts.get(type) or self.prompts["[default]"]
         params = self.sampling_params.get(type) or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                image_bytes, prompt, params, priority
-            )
+            output = await self.client.aio_predict(image_bytes, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    image_bytes, prompt, params, priority
-                )
+                output = await self.client.aio_predict(image_bytes, prompt, params, priority)
 
         # Post-process output
         if output:
@@ -203,14 +195,10 @@ class GlmOCRClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="ocr-glmocr-extraction"):
-                        return await self._do_content_extract(
-                            image, type, priority, semaphore
-                        )
+                        return await self._do_content_extract(image, type, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-glmocr-extraction"):
-                    return await self._do_content_extract(
-                        image, type, priority, semaphore
-                    )
+                    return await self._do_content_extract(image, type, priority, semaphore)
         else:
             return await self._do_content_extract(image, type, priority, semaphore)
 
@@ -242,9 +230,7 @@ class GlmOCRClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(
-                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_content_extract(img, t, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,

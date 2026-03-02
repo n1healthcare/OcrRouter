@@ -100,9 +100,7 @@ class DeepSeekClient:
         use_tqdm: bool | None = None,
     ) -> None:
         if backend != "http-client":
-            raise ValueError(
-                f"Unsupported backend: {backend}. Only 'http-client' is supported."
-            )
+            raise ValueError(f"Unsupported backend: {backend}. Only 'http-client' is supported.")
 
         self._settings = settings
 
@@ -155,23 +153,15 @@ class DeepSeekClient:
         Returns:
             List of ContentBlock with type and bbox (content set to None)
         """
-        layout_image = await self.preprocessor.aio_prepare_for_layout(
-            self.executor, image
-        )
+        layout_image = await self.preprocessor.aio_prepare_for_layout(self.executor, image)
         prompt = self.prompts.get("[layout]") or self.prompts["[default]"]
-        params = self.sampling_params.get("[layout]") or self.sampling_params.get(
-            "[default]"
-        )
+        params = self.sampling_params.get("[layout]") or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                layout_image, prompt, params, priority
-            )
+            output = await self.client.aio_predict(layout_image, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    layout_image, prompt, params, priority
-                )
+                output = await self.client.aio_predict(layout_image, prompt, params, priority)
 
         blocks = await self.postprocessor.aio_parse_layout_output(self.executor, output)
 
@@ -206,9 +196,7 @@ class DeepSeekClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="layout-deepseek-detection"
-                    ):
+                    with langfuse.start_as_current_span(name="layout-deepseek-detection"):
                         return await self._do_layout_detect(image, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="layout-deepseek-detection"):
@@ -240,9 +228,7 @@ class DeepSeekClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_layout_detect(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_layout_detect(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -274,14 +260,10 @@ class DeepSeekClient:
         params = self.sampling_params.get(type) or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                image_bytes, prompt, params, priority
-            )
+            output = await self.client.aio_predict(image_bytes, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    image_bytes, prompt, params, priority
-                )
+                output = await self.client.aio_predict(image_bytes, prompt, params, priority)
 
         # Clean up end-of-sentence markers if present
         if output and "<｜end▁of▁sentence｜>" in output:
@@ -319,14 +301,10 @@ class DeepSeekClient:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
                     with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):
-                        return await self._do_content_extract(
-                            image, type, priority, semaphore
-                        )
+                        return await self._do_content_extract(image, type, priority, semaphore)
             else:
                 with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):
-                    return await self._do_content_extract(
-                        image, type, priority, semaphore
-                    )
+                    return await self._do_content_extract(image, type, priority, semaphore)
         else:
             return await self._do_content_extract(image, type, priority, semaphore)
 
@@ -358,9 +336,7 @@ class DeepSeekClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_content_extract(
-                    img, t, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_content_extract(img, t, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, t, p) in enumerate(zip(images, types, priority))
             ],
             use_tqdm=self.use_tqdm,
@@ -383,23 +359,15 @@ class DeepSeekClient:
         Returns:
             List of ContentBlock with layout info and raw content
         """
-        layout_image = await self.preprocessor.aio_prepare_for_layout(
-            self.executor, image
-        )
+        layout_image = await self.preprocessor.aio_prepare_for_layout(self.executor, image)
         prompt = self.prompts.get("[two_step]") or self.prompts["[default]"]
-        params = self.sampling_params.get("[two_step]") or self.sampling_params.get(
-            "[default]"
-        )
+        params = self.sampling_params.get("[two_step]") or self.sampling_params.get("[default]")
 
         if semaphore is None:
-            output = await self.client.aio_predict(
-                layout_image, prompt, params, priority
-            )
+            output = await self.client.aio_predict(layout_image, prompt, params, priority)
         else:
             async with semaphore:
-                output = await self.client.aio_predict(
-                    layout_image, prompt, params, priority
-                )
+                output = await self.client.aio_predict(layout_image, prompt, params, priority)
 
         # Clean up end-of-sentence markers if present
         if output and "<｜end▁of▁sentence｜>" in output:
@@ -448,12 +416,8 @@ class DeepSeekClient:
         if langfuse:
             if page_idx is not None:
                 with langfuse.start_as_current_span(name=f"page-{page_idx}"):
-                    with langfuse.start_as_current_span(
-                        name="layout-deepseek-detection"
-                    ):
-                        blocks = await self._do_two_step_layout(
-                            image, priority, semaphore
-                        )
+                    with langfuse.start_as_current_span(name="layout-deepseek-detection"):
+                        blocks = await self._do_two_step_layout(image, priority, semaphore)
                     with langfuse.start_as_current_span(name="ocr-deepseek-extraction"):
                         return await self._do_two_step_ocr(blocks)
             else:
@@ -489,9 +453,7 @@ class DeepSeekClient:
         total_pages = len(images)
         return await gather_tasks(
             tasks=[
-                self.aio_two_step_extract(
-                    img, p, semaphore, page_idx=idx if total_pages > 1 else None
-                )
+                self.aio_two_step_extract(img, p, semaphore, page_idx=idx if total_pages > 1 else None)
                 for idx, (img, p) in enumerate(zip(images, priority))
             ],
             use_tqdm=self.use_tqdm,

@@ -52,9 +52,7 @@ class InputHandler:
         else:
             raise ValueError(f"Unsupported file type: {file_suffix}")
 
-    def read_multiple(
-        self, inputs: list[str | Path | bytes | tuple[str, bytes]]
-    ) -> list[tuple[str, bytes]]:
+    def read_multiple(self, inputs: list[str | Path | bytes | tuple[str, bytes]]) -> list[tuple[str, bytes]]:
         """Read multiple inputs.
 
         Args:
@@ -75,9 +73,7 @@ class InputHandler:
                 file_name = f"document_{i}"
                 pdf_bytes = self.read(input_data)
             else:
-                path = (
-                    Path(input_data) if not isinstance(input_data, Path) else input_data
-                )
+                path = Path(input_data) if not isinstance(input_data, Path) else input_data
                 file_name = path.stem
                 pdf_bytes = self.read(path)
             results.append((file_name, pdf_bytes))
@@ -97,9 +93,7 @@ class InputHandler:
                 file_bytes = input_data
                 file_suffix = guess_suffix_by_bytes(file_bytes)
             else:
-                path = (
-                    Path(input_data) if not isinstance(input_data, Path) else input_data
-                )
+                path = Path(input_data) if not isinstance(input_data, Path) else input_data
                 if not path.exists():
                     return False
                 with open(str(path), "rb") as f:

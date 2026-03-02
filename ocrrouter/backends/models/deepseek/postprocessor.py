@@ -27,9 +27,7 @@ _GROUNDING_PATTERN_V2 = re.compile(r"(\w+)\[\[([\d,\s\[\]]+)\]\]")
 _TABLE_HTML_PATTERN = re.compile(r"<table>.*?</table>", re.DOTALL)
 
 
-def _convert_bbox_deepseek(
-    x1: int | str, y1: int | str, x2: int | str, y2: int | str
-) -> list[float] | None:
+def _convert_bbox_deepseek(x1: int | str, y1: int | str, x2: int | str, y2: int | str) -> list[float] | None:
     """Convert DeepSeek bbox (0-999 range) to normalized [0-1] range.
 
     Args:
@@ -147,10 +145,7 @@ def _extract_table_html_from_caption(blocks: list[ContentBlock]) -> list[Content
         if block.type == "table" and not block.content:
             if i + 1 < len(blocks):
                 next_block = blocks[i + 1]
-                if (
-                    next_block.type in ("table_caption", "table_footnote")
-                    and next_block.content
-                ):
+                if next_block.type in ("table_caption", "table_footnote") and next_block.content:
                     match = _TABLE_HTML_PATTERN.search(next_block.content)
                     if match:
                         # Move HTML to table block
@@ -241,9 +236,7 @@ class DeepSeekPostprocessor(BasePostprocessor):
             # Map DeepSeek label to MinerU block type
             block_type = map_deepseek_label(label_type)
             if block_type not in BLOCK_TYPES:
-                print(
-                    f"Warning: unknown block type after mapping: {label_type} -> {block_type}"
-                )
+                print(f"Warning: unknown block type after mapping: {label_type} -> {block_type}")
                 block_type = "unknown"
 
             # Extract content: from end of this match to start of next match (or end of string)
@@ -276,9 +269,7 @@ class DeepSeekPostprocessor(BasePostprocessor):
                 block_content = content if bbox_idx == 0 else ""
 
                 # DeepSeek doesn't provide angle information, default to None
-                blocks.append(
-                    ContentBlock(block_type, bbox, angle=None, content=block_content)
-                )
+                blocks.append(ContentBlock(block_type, bbox, angle=None, content=block_content))
 
         return blocks
 

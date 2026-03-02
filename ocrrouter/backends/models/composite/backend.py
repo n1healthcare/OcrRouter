@@ -99,9 +99,7 @@ class CompositeBackend(BaseModelBackend):
         # Log the configuration
         layout_model = self._settings.layout_model
         ocr_model = self._settings.ocr_model
-        logger.debug(
-            f"Composite backend: layout_model={layout_model}, ocr_model={ocr_model}"
-        )
+        logger.debug(f"Composite backend: layout_model={layout_model}, ocr_model={ocr_model}")
 
         # Run based on output_mode
         if output_mode == "layout_only":
@@ -112,9 +110,7 @@ class CompositeBackend(BaseModelBackend):
         elif output_mode == "ocr_only":
             # Full-page OCR - skip layout detection
             logger.debug("Running full-page OCR only (ocr_only mode)")
-            ocr_texts = await self.client.aio_batch_content_extract(
-                images=images_pil_list
-            )
+            ocr_texts = await self.client.aio_batch_content_extract(images=images_pil_list)
             # Convert OCR texts to full-page ContentBlocks
             results = []
             for text in ocr_texts:
@@ -131,12 +127,8 @@ class CompositeBackend(BaseModelBackend):
 
         else:  # "all" mode - default behavior
             # Run composite two-step extraction
-            logger.debug(
-                f"Running composite two-step extraction (layout={layout_model}, ocr={ocr_model})"
-            )
-            results = await self.client.aio_batch_two_step_extract(
-                images=images_pil_list
-            )
+            logger.debug(f"Running composite two-step extraction (layout={layout_model}, ocr={ocr_model})")
+            results = await self.client.aio_batch_two_step_extract(images=images_pil_list)
 
         # Resolve table_merge_enable from settings if not provided
         if table_merge_enable is None:

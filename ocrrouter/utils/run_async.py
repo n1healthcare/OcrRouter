@@ -43,9 +43,7 @@ def run_async(coroutine: Coroutine[Any, Any, T]) -> T:
                     task.cancel()
                 # Wait for all tasks to complete cancellation
                 if pending:
-                    loop.run_until_complete(
-                        asyncio.gather(*pending, return_exceptions=True)
-                    )
+                    loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
                 # Shutdown async generators
                 loop.run_until_complete(loop.shutdown_asyncgens())
                 # Shutdown default executor

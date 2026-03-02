@@ -27,9 +27,7 @@ class OutputCleaner:
     """Data Cleaner for malformed JSON responses."""
 
     def __init__(self):
-        self.dict_pattern = re.compile(
-            r'\{[^{}]*?"bbox"\s*:\s*\[[^\]]*?\][^{}]*?\}', re.DOTALL
-        )
+        self.dict_pattern = re.compile(r'\{[^{}]*?"bbox"\s*:\s*\[[^\]]*?\][^{}]*?\}', re.DOTALL)
         self.bbox_pattern = re.compile(r'"bbox"\s*:\s*\[([^\]]+)\]')
         self.missing_delimiter_pattern = re.compile(r'\}\s*\{(?!")')
 
@@ -245,9 +243,7 @@ class OutputCleaner:
         if not duplicates_to_remove:
             return data_list
 
-        return [
-            item for i, item in enumerate(data_list) if i not in duplicates_to_remove
-        ]
+        return [item for i, item in enumerate(data_list) if i not in duplicates_to_remove]
 
     def clean_model_output(self, model_output: Any) -> list[dict]:
         """Main cleaning method."""
@@ -511,9 +507,7 @@ class DotsOCRPostprocessor(BasePostprocessor):
             if not bbox_raw:
                 continue
 
-            bbox = convert_bbox_dotsocr(
-                bbox_raw, orig_width, orig_height, resized_width, resized_height
-            )
+            bbox = convert_bbox_dotsocr(bbox_raw, orig_width, orig_height, resized_width, resized_height)
             if bbox is None:
                 if self.debug:
                     print(f"Warning: invalid bbox: {bbox_raw}")

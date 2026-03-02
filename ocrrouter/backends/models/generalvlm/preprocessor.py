@@ -26,8 +26,7 @@ class GeneralVLMPreprocessor(BasePreprocessor):
             NotImplementedError: Always, as General VLM only supports OCR.
         """
         raise NotImplementedError(
-            "General VLM does not support layout detection. "
-            "Use prepare_for_ocr() for OCR extraction."
+            "General VLM does not support layout detection. Use prepare_for_ocr() for OCR extraction."
         )
 
     def prepare_for_ocr(

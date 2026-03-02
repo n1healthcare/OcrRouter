@@ -77,6 +77,4 @@ def get_backend(backend_name: str, settings: Settings) -> BaseModelBackend:
             "ppdoclayout",
             "lightonocr",
         ]
-        raise ValueError(
-            f"Unknown backend: '{backend_name}'. Available backends: {available_backends}"
-        )
+        raise ValueError(f"Unknown backend: '{backend_name}'. Available backends: {available_backends}")

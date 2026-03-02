@@ -96,9 +96,7 @@ class GlmOCRBackend(BaseModelBackend):
                 "Use composite backend with a layout model if layout detection is needed."
             )
             # Return empty results for layout_only
-            images_list, pdf_doc = load_images_from_pdf(
-                pdf_bytes, image_type=ImageType.PIL
-            )
+            images_list, pdf_doc = load_images_from_pdf(pdf_bytes, image_type=ImageType.PIL)
             results = [[] for _ in images_list]
             middle_json = result_to_middle_json(
                 results,

@@ -21,7 +21,7 @@ def cal_canvas_rect(page, bbox):
     """
     page_width, page_height = float(page.cropbox[2]), float(page.cropbox[3])
 
-    actual_width = page_width    # The width of the final PDF display
+    actual_width = page_width  # The width of the final PDF display
     actual_height = page_height  # The height of the final PDF display
 
     rotation_obj = page.get("/Rotate", 0)
@@ -141,8 +141,8 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
         list_items = []
         indices = []
 
-        for dropped_bbox in page['discarded_blocks']:
-            page_dropped_list.append(dropped_bbox['bbox'])
+        for dropped_bbox in page["discarded_blocks"]:
+            page_dropped_list.append(dropped_bbox["bbox"])
         dropped_bbox_list.append(page_dropped_list)
         for block in page["para_blocks"]:
             bbox = block["bbox"]
@@ -298,16 +298,16 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
     dropped_list = []
 
     def get_span_info(span):
-        if span['type'] == ContentType.TEXT:
-            page_text_list.append(span['bbox'])
-        elif span['type'] == ContentType.INLINE_EQUATION:
-            page_inline_equation_list.append(span['bbox'])
-        elif span['type'] == ContentType.INTERLINE_EQUATION:
-            page_interline_equation_list.append(span['bbox'])
-        elif span['type'] == ContentType.IMAGE:
-            page_image_list.append(span['bbox'])
-        elif span['type'] == ContentType.TABLE:
-            page_table_list.append(span['bbox'])
+        if span["type"] == ContentType.TEXT:
+            page_text_list.append(span["bbox"])
+        elif span["type"] == ContentType.INLINE_EQUATION:
+            page_inline_equation_list.append(span["bbox"])
+        elif span["type"] == ContentType.INTERLINE_EQUATION:
+            page_interline_equation_list.append(span["bbox"])
+        elif span["type"] == ContentType.IMAGE:
+            page_image_list.append(span["bbox"])
+        elif span["type"] == ContentType.TABLE:
+            page_table_list.append(span["bbox"])
 
     for page in pdf_info:
         page_text_list = []
@@ -317,31 +317,30 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
         page_table_list = []
         page_dropped_list = []
 
-
         # 构造dropped_list
-        for block in page['discarded_blocks']:
-            if block['type'] == BlockType.DISCARDED:
-                for line in block['lines']:
-                    for span in line['spans']:
-                        page_dropped_list.append(span['bbox'])
+        for block in page["discarded_blocks"]:
+            if block["type"] == BlockType.DISCARDED:
+                for line in block["lines"]:
+                    for span in line["spans"]:
+                        page_dropped_list.append(span["bbox"])
         dropped_list.append(page_dropped_list)
         # 构造其余useful_list
         # for block in page['para_blocks']:  # span直接用分段合并前的结果就可以
-        for block in page['preproc_blocks']:
-            if block['type'] in [
+        for block in page["preproc_blocks"]:
+            if block["type"] in [
                 BlockType.TEXT,
                 BlockType.TITLE,
                 BlockType.INTERLINE_EQUATION,
                 BlockType.LIST,
                 BlockType.INDEX,
             ]:
-                for line in block['lines']:
-                    for span in line['spans']:
+                for line in block["lines"]:
+                    for span in line["spans"]:
                         get_span_info(span)
-            elif block['type'] in [BlockType.IMAGE, BlockType.TABLE]:
-                for sub_block in block['blocks']:
-                    for line in sub_block['lines']:
-                        for span in line['spans']:
+            elif block["type"] in [BlockType.IMAGE, BlockType.TABLE]:
+                for sub_block in block["blocks"]:
+                    for line in sub_block["lines"]:
+                        for span in line["spans"]:
                             get_span_info(span)
         text_list.append(page_text_list)
         inline_equation_list.append(page_inline_equation_list)
@@ -363,7 +362,7 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
         c = canvas.Canvas(packet, pagesize=custom_page_size)
 
         # 获取当前页面的数据
-        draw_bbox_without_number(i, text_list, page, c,[255, 0, 0], False)
+        draw_bbox_without_number(i, text_list, page, c, [255, 0, 0], False)
         draw_bbox_without_number(i, inline_equation_list, page, c, [0, 255, 0], False)
         draw_bbox_without_number(i, interline_equation_list, page, c, [0, 0, 255], False)
         draw_bbox_without_number(i, image_list, page, c, [255, 204, 0], False)
@@ -397,44 +396,52 @@ def draw_line_sort_bbox(pdf_info, pdf_bytes, out_path, filename):
 
     for page in pdf_info:
         page_line_list = []
-        for block in page['preproc_blocks']:
-            if block['type'] in [BlockType.TEXT]:
-                for line in block['lines']:
-                    bbox = line['bbox']
-                    index = line['index']
-                    page_line_list.append({'index': index, 'bbox': bbox})
-            elif block['type'] in [BlockType.TITLE, BlockType.INTERLINE_EQUATION]:
-                if 'virtual_lines' in block:
-                    if len(block['virtual_lines']) > 0 and block['virtual_lines'][0].get('index', None) is not None:
-                        for line in block['virtual_lines']:
-                            bbox = line['bbox']
-                            index = line['index']
-                            page_line_list.append({'index': index, 'bbox': bbox})
+        for block in page["preproc_blocks"]:
+            if block["type"] in [BlockType.TEXT]:
+                for line in block["lines"]:
+                    bbox = line["bbox"]
+                    index = line["index"]
+                    page_line_list.append({"index": index, "bbox": bbox})
+            elif block["type"] in [BlockType.TITLE, BlockType.INTERLINE_EQUATION]:
+                if "virtual_lines" in block:
+                    if len(block["virtual_lines"]) > 0 and block["virtual_lines"][0].get("index", None) is not None:
+                        for line in block["virtual_lines"]:
+                            bbox = line["bbox"]
+                            index = line["index"]
+                            page_line_list.append({"index": index, "bbox": bbox})
                 else:
-                    for line in block['lines']:
-                        bbox = line['bbox']
-                        index = line['index']
-                        page_line_list.append({'index': index, 'bbox': bbox})
-            elif block['type'] in [BlockType.IMAGE, BlockType.TABLE]:
-                for sub_block in block['blocks']:
-                    if sub_block['type'] in [BlockType.IMAGE_BODY, BlockType.TABLE_BODY]:
-                        if len(sub_block['virtual_lines']) > 0 and sub_block['virtual_lines'][0].get('index', None) is not None:
-                            for line in sub_block['virtual_lines']:
-                                bbox = line['bbox']
-                                index = line['index']
-                                page_line_list.append({'index': index, 'bbox': bbox})
+                    for line in block["lines"]:
+                        bbox = line["bbox"]
+                        index = line["index"]
+                        page_line_list.append({"index": index, "bbox": bbox})
+            elif block["type"] in [BlockType.IMAGE, BlockType.TABLE]:
+                for sub_block in block["blocks"]:
+                    if sub_block["type"] in [BlockType.IMAGE_BODY, BlockType.TABLE_BODY]:
+                        if (
+                            len(sub_block["virtual_lines"]) > 0
+                            and sub_block["virtual_lines"][0].get("index", None) is not None
+                        ):
+                            for line in sub_block["virtual_lines"]:
+                                bbox = line["bbox"]
+                                index = line["index"]
+                                page_line_list.append({"index": index, "bbox": bbox})
                         else:
-                            for line in sub_block['lines']:
-                                bbox = line['bbox']
-                                index = line['index']
-                                page_line_list.append({'index': index, 'bbox': bbox})
-                    elif sub_block['type'] in [BlockType.IMAGE_CAPTION, BlockType.TABLE_CAPTION, BlockType.IMAGE_FOOTNOTE, BlockType.TABLE_FOOTNOTE]:
-                        for line in sub_block['lines']:
-                            bbox = line['bbox']
-                            index = line['index']
-                            page_line_list.append({'index': index, 'bbox': bbox})
-        sorted_bboxes = sorted(page_line_list, key=lambda x: x['index'])
-        layout_bbox_list.append(sorted_bbox['bbox'] for sorted_bbox in sorted_bboxes)
+                            for line in sub_block["lines"]:
+                                bbox = line["bbox"]
+                                index = line["index"]
+                                page_line_list.append({"index": index, "bbox": bbox})
+                    elif sub_block["type"] in [
+                        BlockType.IMAGE_CAPTION,
+                        BlockType.TABLE_CAPTION,
+                        BlockType.IMAGE_FOOTNOTE,
+                        BlockType.TABLE_FOOTNOTE,
+                    ]:
+                        for line in sub_block["lines"]:
+                            bbox = line["bbox"]
+                            index = line["index"]
+                            page_line_list.append({"index": index, "bbox": bbox})
+        sorted_bboxes = sorted(page_line_list, key=lambda x: x["index"])
+        layout_bbox_list.append(sorted_bbox["bbox"] for sorted_bbox in sorted_bboxes)
     pdf_bytes_io = BytesIO(pdf_bytes)
     pdf_docs = PdfReader(pdf_bytes_io)
     output_pdf = PdfWriter()

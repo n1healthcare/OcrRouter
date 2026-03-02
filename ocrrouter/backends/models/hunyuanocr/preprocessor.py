@@ -26,8 +26,7 @@ class HunyuanOCRPreprocessor(BasePreprocessor):
             NotImplementedError: Always, as Hunyuan only supports OCR.
         """
         raise NotImplementedError(
-            "HunyuanOCR does not support layout detection. "
-            "Use prepare_for_ocr() for OCR extraction."
+            "HunyuanOCR does not support layout detection. Use prepare_for_ocr() for OCR extraction."
         )
 
     def prepare_for_ocr(

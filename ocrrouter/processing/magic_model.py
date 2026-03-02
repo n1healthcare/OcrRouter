@@ -103,9 +103,7 @@ class MagicModel:
                 span = {
                     "bbox": block_bbox,
                     "type": span_type,
-                    "content": isolated_formula_clean(block_content)
-                    if block_content
-                    else None,
+                    "content": isolated_formula_clean(block_content) if block_content else None,
                 }
             else:
                 if block_content:
@@ -178,9 +176,7 @@ class MagicModel:
                 self.all_spans.extend(span)
                 spans = span
             else:
-                raise ValueError(
-                    f"Invalid span type: {span_type}, expected dict or list, got {type(span)}"
-                )
+                raise ValueError(f"Invalid span type: {span_type}, expected dict or list, got {type(span)}")
 
             # 构造line对象
             if block_type in [BlockType.CODE_BODY]:
@@ -255,15 +251,9 @@ class MagicModel:
         self.list_blocks, self.text_blocks, self.ref_text_blocks = fix_list_blocks(
             self.list_blocks, self.text_blocks, self.ref_text_blocks
         )
-        self.image_blocks, not_include_image_blocks = fix_two_layer_blocks(
-            self.image_blocks, BlockType.IMAGE
-        )
-        self.table_blocks, not_include_table_blocks = fix_two_layer_blocks(
-            self.table_blocks, BlockType.TABLE
-        )
-        self.code_blocks, not_include_code_blocks = fix_two_layer_blocks(
-            self.code_blocks, BlockType.CODE
-        )
+        self.image_blocks, not_include_image_blocks = fix_two_layer_blocks(self.image_blocks, BlockType.IMAGE)
+        self.table_blocks, not_include_table_blocks = fix_two_layer_blocks(self.table_blocks, BlockType.TABLE)
+        self.code_blocks, not_include_code_blocks = fix_two_layer_blocks(self.code_blocks, BlockType.CODE)
         for code_block in self.code_blocks:
             for block in code_block["blocks"]:
                 if block["type"] == BlockType.CODE_BODY:
@@ -277,11 +267,7 @@ class MagicModel:
                         code_block["sub_type"] = "code"
                         code_block["guess_lang"] = "txt"
 
-        for block in (
-            not_include_image_blocks
-            + not_include_table_blocks
-            + not_include_code_blocks
-        ):
+        for block in not_include_image_blocks + not_include_table_blocks + not_include_code_blocks:
             block["type"] = BlockType.TEXT
             self.text_blocks.append(block)
 
@@ -368,11 +354,7 @@ def code_content_clean(content):
 
 
 def clean_content(content):
-    if (
-        content
-        and content.count("\\[") == content.count("\\]")
-        and content.count("\\[") > 0
-    ):
+    if content and content.count("\\[") == content.count("\\]") and content.count("\\[") > 0:
         # Function to handle each match
         def replace_pattern(match):
             # Extract content between \[ and \]
@@ -429,12 +411,8 @@ def __tie_up_category_by_distance_v3(blocks, subject_block_type, object_block_ty
 
 
 def get_type_blocks(blocks, block_type: Literal["image", "table", "code"]):
-    with_captions = __tie_up_category_by_distance_v3(
-        blocks, f"{block_type}_body", f"{block_type}_caption"
-    )
-    with_footnotes = __tie_up_category_by_distance_v3(
-        blocks, f"{block_type}_body", f"{block_type}_footnote"
-    )
+    with_captions = __tie_up_category_by_distance_v3(blocks, f"{block_type}_body", f"{block_type}_caption")
+    with_footnotes = __tie_up_category_by_distance_v3(blocks, f"{block_type}_body", f"{block_type}_footnote")
     ret = []
     for v in with_captions:
         record = {
@@ -543,9 +521,7 @@ def fix_two_layer_blocks(blocks, fix_type: Literal["image", "table", "code"]):
 
             if best_block_idx is not None:
                 # 找到合适的body，添加到对应block的caption_list
-                need_fix_blocks[best_block_idx][f"{fix_type}_caption_list"].append(
-                    caption
-                )
+                need_fix_blocks[best_block_idx][f"{fix_type}_caption_list"].append(caption)
             else:
                 # 没找到合适的body，作为普通block处理
                 not_include_blocks.append(caption)
@@ -567,9 +543,7 @@ def fix_two_layer_blocks(blocks, fix_type: Literal["image", "table", "code"]):
 
             if best_block_idx is not None:
                 # 找到合适的body，添加到对应block的footnote_list
-                need_fix_blocks[best_block_idx][f"{fix_type}_footnote_list"].append(
-                    footnote
-                )
+                need_fix_blocks[best_block_idx][f"{fix_type}_footnote_list"].append(footnote)
             else:
                 # 没找到合适的body，作为普通block处理
                 not_include_blocks.append(footnote)
@@ -659,12 +633,7 @@ def fix_list_blocks(list_blocks, text_blocks, ref_text_blocks):
     need_remove_blocks = []
     for block in temp_text_blocks:
         for list_block in list_blocks:
-            if (
-                calculate_overlap_area_in_bbox1_area_ratio(
-                    block["bbox"], list_block["bbox"]
-                )
-                >= 0.8
-            ):
+            if calculate_overlap_area_in_bbox1_area_ratio(block["bbox"], list_block["bbox"]) >= 0.8:
                 list_block["blocks"].append(block)
                 need_remove_blocks.append(block)
                 break

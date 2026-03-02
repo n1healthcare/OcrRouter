@@ -40,9 +40,7 @@ class Preprocessor:
         Returns:
             PDF bytes containing only the specified page range.
         """
-        start_page_id = (
-            start_page_id if start_page_id is not None else self._settings.start_page
-        )
+        start_page_id = start_page_id if start_page_id is not None else self._settings.start_page
         end_page_id = end_page_id if end_page_id is not None else self._settings.end_page
 
         return self._extract_page_range(pdf_bytes, start_page_id, end_page_id)
@@ -76,18 +74,14 @@ class Preprocessor:
                     output_index += 1
                 except Exception as page_error:
                     output_pdf.del_page(output_index)
-                    logger.warning(
-                        f"Failed to import page {page_index}: {page_error}, skipping this page."
-                    )
+                    logger.warning(f"Failed to import page {page_index}: {page_error}, skipping this page.")
                     continue
 
             output_buffer = io.BytesIO()
             output_pdf.save(output_buffer)
             output_bytes = output_buffer.getvalue()
         except Exception as e:
-            logger.warning(
-                f"Error in converting PDF bytes: {e}, Using original PDF bytes."
-            )
+            logger.warning(f"Error in converting PDF bytes: {e}, Using original PDF bytes.")
             output_bytes = pdf_bytes
         finally:
             pdf.close()
@@ -112,7 +106,4 @@ class Preprocessor:
         Returns:
             List of prepared PDF bytes.
         """
-        return [
-            self.prepare(pdf_bytes, start_page_id, end_page_id, **kwargs)
-            for pdf_bytes in pdf_bytes_list
-        ]
+        return [self.prepare(pdf_bytes, start_page_id, end_page_id, **kwargs) for pdf_bytes in pdf_bytes_list]

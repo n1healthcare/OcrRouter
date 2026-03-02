@@ -242,9 +242,7 @@ class HttpVlmClient(VlmClient):
             )
 
         if api_key is None:
-            raise ValueError(
-                "API key must be provided either as parameter or via OPENAI_API_KEY environment variable"
-            )
+            raise ValueError("API key must be provided either as parameter or via OPENAI_API_KEY environment variable")
 
         if model_name is None:
             raise ValueError(
@@ -426,15 +424,11 @@ class HttpVlmClient(VlmClient):
         elif "length" in error_msg or "truncated" in error_msg:
             error_type = "truncated"
             if not self.allow_truncated_content:
-                translated = RequestError(
-                    "The response was truncated due to length limit."
-                )
+                translated = RequestError("The response was truncated due to length limit.")
             else:
                 self.logger.warning("The response was truncated due to length limit.")
                 return
-        elif "model" in error_msg and (
-            "not found" in error_msg or "does not exist" in error_msg
-        ):
+        elif "model" in error_msg and ("not found" in error_msg or "does not exist" in error_msg):
             error_type = "model_not_found"
             translated = RequestError(
                 f"Model '{self.model_name}' not found in the response from {self.server_url}/v1/models. Please check if the model is available on the server."
@@ -444,9 +438,7 @@ class HttpVlmClient(VlmClient):
             translated = RequestError(f"Unexpected finish reason: {e}")
         else:
             error_type = "server_error"
-            translated = ServerError(
-                f"Unexpected status code: [500], response body: {e}"
-            )
+            translated = ServerError(f"Unexpected status code: [500], response body: {e}")
 
         # Save failed request if debug mode is enabled
         should_save = self.debug and error_type in [
@@ -483,11 +475,7 @@ class HttpVlmClient(VlmClient):
         def truncate_base64_in_dict(obj):
             if isinstance(obj, dict):
                 for key, value in obj.items():
-                    if (
-                        key == "url"
-                        and isinstance(value, str)
-                        and value.startswith("data:image")
-                    ):
+                    if key == "url" and isinstance(value, str) and value.startswith("data:image"):
                         match = re.match(r"(data:image/[^;]+;base64,)(.+)", value)
                         if match:
                             prefix = match.group(1)
@@ -514,9 +502,7 @@ class HttpVlmClient(VlmClient):
                 content = ""
             return content
         except Exception as e:
-            raise ServerError(
-                f"Failed to parse response JSON: {e}, response body: {response}"
-            )
+            raise ServerError(f"Failed to parse response JSON: {e}, response body: {response}")
 
     async def aio_predict(
         self,
@@ -588,9 +574,7 @@ class HttpVlmClient(VlmClient):
             priority = [priority] * len(images)
 
         assert len(prompts) == len(images), "Length of prompts and images must match."
-        assert len(sampling_params) == len(images), (
-            "Length of sampling_params and images must match."
-        )
+        assert len(sampling_params) == len(images), "Length of sampling_params and images must match."
         assert len(priority) == len(images), "Length of priority and images must match."
 
         # Load and prepare all images
@@ -606,9 +590,7 @@ class HttpVlmClient(VlmClient):
 
         # Build all messages with per-request kwargs
         tasks = []
-        for (img, img_format), prompt, sp, p in zip(
-            processed_images, prompts, sampling_params, priority
-        ):
+        for (img, img_format), prompt, sp, p in zip(processed_images, prompts, sampling_params, priority):
             messages = self._build_messages(
                 system_prompt=self.system_prompt,
                 image=img,
@@ -630,9 +612,7 @@ class HttpVlmClient(VlmClient):
                 async with semaphore:
                     return await task
 
-            responses = await asyncio.gather(
-                *[_execute_with_semaphore(task) for task in tasks]
-            )
+            responses = await asyncio.gather(*[_execute_with_semaphore(task) for task in tasks])
 
             results = [self._extract_content(response) for response in responses]
 
@@ -664,9 +644,7 @@ class HttpVlmClient(VlmClient):
             priority = [priority] * len(images)
 
         assert len(prompts) == len(images), "Length of prompts and images must match."
-        assert len(sampling_params) == len(images), (
-            "Length of sampling_params and images must match."
-        )
+        assert len(sampling_params) == len(images), "Length of sampling_params and images must match."
         assert len(priority) == len(images), "Length of priority and images must match."
 
         # Load and prepare all images
@@ -754,9 +732,7 @@ def new_vlm_client(
         A configured VlmClient instance.
     """
     if backend != "http-client":
-        raise ValueError(
-            f"Unsupported backend: {backend}. Only 'http-client' is supported."
-        )
+        raise ValueError(f"Unsupported backend: {backend}. Only 'http-client' is supported.")
 
     return HttpVlmClient(
         model_name=model_name,

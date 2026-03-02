@@ -104,9 +104,7 @@ class MinerUBackend(BaseModelBackend):
             results = await self.client.aio_batch_layout_detect(images=images_pil_list)
         else:  # "all" mode - default behavior
             # Run VLM model for layout detection and content extraction
-            results = await self.client.aio_batch_two_step_extract(
-                images=images_pil_list
-            )
+            results = await self.client.aio_batch_two_step_extract(images=images_pil_list)
 
         # Resolve table_merge_enable from settings if not provided
         if table_merge_enable is None:

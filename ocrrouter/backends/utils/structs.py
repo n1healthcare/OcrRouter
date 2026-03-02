@@ -89,23 +89,13 @@ class ContentBlock(dict):
         super().__init__()
 
         assert type in BLOCK_TYPES, f"Unknown type: {type}"
-        assert isinstance(bbox, list) and len(bbox) == 4, (
-            "Bounding box must be a list of four coordinates"
-        )
-        assert all(isinstance(coord, (int, float)) for coord in bbox), (
-            "Bounding box coordinates must be numbers"
-        )
-        assert all(0 <= coord <= 1 for coord in bbox), (
-            "Bounding box coordinates must be in the range [0, 1]"
-        )
+        assert isinstance(bbox, list) and len(bbox) == 4, "Bounding box must be a list of four coordinates"
+        assert all(isinstance(coord, (int, float)) for coord in bbox), "Bounding box coordinates must be numbers"
+        assert all(0 <= coord <= 1 for coord in bbox), "Bounding box coordinates must be in the range [0, 1]"
         assert bbox[0] < bbox[2], "Bounding box x1 must be less than x2"
         assert bbox[1] < bbox[3], "Bounding box y1 must be less than y2"
-        assert angle in ANGLE_OPTIONS, (
-            f"Invalid angle: {angle}. Must be one of {ANGLE_OPTIONS}"
-        )
-        assert content is None or isinstance(content, str), (
-            "Content must be a string or None"
-        )
+        assert angle in ANGLE_OPTIONS, f"Invalid angle: {angle}. Must be one of {ANGLE_OPTIONS}"
+        assert content is None or isinstance(content, str), "Content must be a string or None"
 
         self["type"] = type
         self["bbox"] = bbox
@@ -127,15 +117,9 @@ class ContentBlock(dict):
 
     @bbox.setter
     def bbox(self, value: list[float]):
-        assert isinstance(value, list) and len(value) == 4, (
-            "Bounding box must be a list of four coordinates"
-        )
-        assert all(isinstance(coord, (int, float)) for coord in value), (
-            "Bounding box coordinates must be numbers"
-        )
-        assert all(0 <= coord <= 1 for coord in value), (
-            "Bounding box coordinates must be in the range [0, 1]"
-        )
+        assert isinstance(value, list) and len(value) == 4, "Bounding box must be a list of four coordinates"
+        assert all(isinstance(coord, (int, float)) for coord in value), "Bounding box coordinates must be numbers"
+        assert all(0 <= coord <= 1 for coord in value), "Bounding box coordinates must be in the range [0, 1]"
         assert value[0] < value[2], "Bounding box x1 must be less than x2"
         assert value[1] < value[3], "Bounding box y1 must be less than y2"
         self["bbox"] = value
@@ -146,9 +130,7 @@ class ContentBlock(dict):
 
     @angle.setter
     def angle(self, value: Literal[None, 0, 90, 180, 270]):
-        assert value in ANGLE_OPTIONS, (
-            f"Invalid angle: {value}. Must be one of {ANGLE_OPTIONS}"
-        )
+        assert value in ANGLE_OPTIONS, f"Invalid angle: {value}. Must be one of {ANGLE_OPTIONS}"
         self["angle"] = value
 
     @property
@@ -157,7 +139,5 @@ class ContentBlock(dict):
 
     @content.setter
     def content(self, value: str | None):
-        assert value is None or isinstance(value, str), (
-            "Content must be a string or None"
-        )
+        assert value is None or isinstance(value, str), "Content must be a string or None"
         self["content"] = value

@@ -154,8 +154,4 @@ class GeneralVLMPostprocessor(BasePostprocessor):
 
         Filters out empty text blocks.
         """
-        return [
-            block
-            for block in blocks
-            if block.type != "text" or (block.content and block.content.strip())
-        ]
+        return [block for block in blocks if block.type != "text" or (block.content and block.content.strip())]

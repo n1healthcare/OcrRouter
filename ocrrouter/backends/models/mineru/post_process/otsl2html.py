@@ -27,8 +27,7 @@ class TableCell(BaseModel):
                 # "bbox" not in data
                 # or data["bbox"] is None
                 # or isinstance(data["bbox"], BoundingBox)
-                "text"
-                in data
+                "text" in data
             ):
                 return data
             text = data["bbox"].get("token", "")
@@ -186,7 +185,9 @@ def otsl_parse_texts(texts, tokens):
             row_span = 1
             col_span = 1
             right_offset = 1
-            if text != OTSL_ECEL and (texts[i + 1] not in [OTSL_NL, OTSL_FCEL, OTSL_ECEL, OTSL_LCEL, OTSL_UCEL, OTSL_XCEL]):
+            if text != OTSL_ECEL and (
+                texts[i + 1] not in [OTSL_NL, OTSL_FCEL, OTSL_ECEL, OTSL_LCEL, OTSL_UCEL, OTSL_XCEL]
+            ):
                 cell_text = texts[i + 1]
                 right_offset = 2
 
