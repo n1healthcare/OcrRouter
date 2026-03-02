@@ -4,6 +4,7 @@ from typing import Literal
 
 from ocrrouter.backends.models.base import BasePostprocessor
 from ocrrouter.backends.utils import ContentBlock
+
 from .utils import parse_image_bboxes, remove_image_markers
 
 

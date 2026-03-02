@@ -19,10 +19,11 @@ Run:
     python composite_mode.py
 """
 
-import os
 import asyncio
-from pathlib import Path
+import os
 from datetime import datetime
+from pathlib import Path
+
 from ocrrouter import DocumentPipeline, Settings
 
 
@@ -161,7 +162,7 @@ async def compare_composite_configurations(pdf_path: str, output_base: str):
 
             # Show markdown preview
             markdown = r["result"]["markdown"]
-            print(f"  Markdown preview (first 200 chars):")
+            print("  Markdown preview (first 200 chars):")
             print(f"    {markdown[:200].replace(chr(10), ' ')}...")
         else:
             print(f"\n{r['name']}: FAILED - {r.get('error', 'Unknown error')}")
@@ -241,7 +242,7 @@ def simple_composite_example():
     try:
         result = pipeline.process(pdf_path, "output/composite_simple")
 
-        print(f"\n✓ Success!")
+        print("\n✓ Success!")
         print(f"  Output: {result['output_dir']}")
         print(f"  Pages: {len(result.get('middle_json', []))}")
 

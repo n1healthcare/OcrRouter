@@ -7,14 +7,13 @@ from typing import Any
 
 from loguru import logger
 
-from ocrrouter.config import Settings
 from ocrrouter.backends import get_backend
+from ocrrouter.config import Settings
+from ocrrouter.observability import set_langfuse_client
+from ocrrouter.postprocessor import OutputHandler, Postprocessor
+from ocrrouter.preprocessor import InputHandler, Preprocessor
 from ocrrouter.utils.io.writers import FileBasedDataWriter
 from ocrrouter.utils.run_async import run_async
-from ocrrouter.observability import set_langfuse_client
-
-from ocrrouter.preprocessor import InputHandler, Preprocessor
-from ocrrouter.postprocessor import Postprocessor, OutputHandler
 
 
 class DocumentPipeline:

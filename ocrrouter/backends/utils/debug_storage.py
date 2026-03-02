@@ -1,14 +1,14 @@
 """Debug storage utilities for saving failed VLM requests."""
 
+import io
 import json
 import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import io
-from PIL import Image
 from loguru import logger
+from PIL import Image
 
 
 def save_failed_request(

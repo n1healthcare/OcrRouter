@@ -1,11 +1,11 @@
 """DotsOCR-specific image preprocessing before model inference."""
 
 import math
+
 from PIL import Image
 
 from ocrrouter.backends.models.base import BasePreprocessor
 from ocrrouter.backends.utils import get_png_bytes, get_rgb_image
-
 
 # Image processing constants
 IMAGE_FACTOR = 28

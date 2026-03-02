@@ -1,12 +1,13 @@
 """Observability module for OcrRouter using Langfuse."""
 
+from langfuse import observe
+
 from .langfuse_client import (
-    set_langfuse_client,
     generate_session_id,
     get_langfuse_client,
     get_langfuse_handler,
+    set_langfuse_client,
 )
-from langfuse import observe
 
 __all__ = [
     "set_langfuse_client",

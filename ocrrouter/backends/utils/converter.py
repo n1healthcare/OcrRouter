@@ -1,10 +1,9 @@
 """Converter utilities for transforming model outputs to middle JSON format."""
 
-from loguru import logger
 
+from ocrrouter.postprocessor.utils.table_merge import merge_table
 from ocrrouter.processing.magic_model import MagicModel
 from ocrrouter.processing.utils.cut_image import cut_image_and_table
-from ocrrouter.postprocessor.utils.table_merge import merge_table
 from ocrrouter.utils.enum_class import ContentType
 from ocrrouter.utils.hash_utils import bytes_md5
 from ocrrouter.version import __version__

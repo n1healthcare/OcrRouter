@@ -2,8 +2,8 @@
 
 from .backend import BaseModelBackend
 from .client import BaseModelClient
-from .preprocessor import BasePreprocessor
 from .postprocessor import BasePostprocessor
+from .preprocessor import BasePreprocessor
 
 __all__ = [
     "BaseModelBackend",

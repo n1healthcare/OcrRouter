@@ -1,7 +1,6 @@
 """MinerU-specific image preprocessing before model inference."""
 
 import math
-from typing import Literal
 
 from PIL import Image
 

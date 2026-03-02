@@ -4,12 +4,12 @@ from typing import Any, Literal
 
 from loguru import logger
 
-from ocrrouter.config import Settings
-from ocrrouter.utils.io.writers import DataWriter
-from ocrrouter.preprocessor.utils.pdf_image_tools import load_images_from_pdf
-from ocrrouter.utils.enum_class import ImageType
 from ocrrouter.backends.models.base import BaseModelBackend
 from ocrrouter.backends.utils import result_to_middle_json
+from ocrrouter.config import Settings
+from ocrrouter.preprocessor.utils.pdf_image_tools import load_images_from_pdf
+from ocrrouter.utils.enum_class import ImageType
+from ocrrouter.utils.io.writers import DataWriter
 
 from .client import DeepSeekClient
 

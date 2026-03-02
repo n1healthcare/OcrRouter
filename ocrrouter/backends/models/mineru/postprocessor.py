@@ -4,17 +4,17 @@ import re
 from typing import Literal
 
 from ocrrouter.backends.models.base import BasePostprocessor
-from ocrrouter.backends.utils import ContentBlock, BLOCK_TYPES, convert_otsl_to_html
+from ocrrouter.backends.utils import BLOCK_TYPES, ContentBlock, convert_otsl_to_html
 
-# Import individual equation fix functions from the post_process submodules
-from .post_process.equation_unbalanced_braces import try_fix_unbalanced_braces
+from .post_process.equation_big import try_fix_equation_big
 from .post_process.equation_block import do_handle_equation_block
 from .post_process.equation_double_subscript import try_fix_equation_double_subscript
 from .post_process.equation_fix_eqqcolon import try_fix_equation_eqqcolon
-from .post_process.equation_big import try_fix_equation_big
-from .post_process.equation_leq import try_fix_equation_leq
 from .post_process.equation_left_right import try_match_equation_left_right
+from .post_process.equation_leq import try_fix_equation_leq
 
+# Import individual equation fix functions from the post_process submodules
+from .post_process.equation_unbalanced_braces import try_fix_unbalanced_braces
 
 # Layout detection regex pattern
 # Format: <|box_start|>x1 y1 x2 y2<|box_end|><|ref_start|>type<|ref_end|>optional_angle

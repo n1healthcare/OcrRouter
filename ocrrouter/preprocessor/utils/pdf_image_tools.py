@@ -1,20 +1,20 @@
 import os
+from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from io import BytesIO
 
 import numpy as np
 import pypdfium2 as pdfium
-from loguru import logger
 from PIL import Image
 
-from ocrrouter.utils.io.writers import FileBasedDataWriter
 from ocrrouter.utils.check_sys_env import is_windows_environment
-from ocrrouter.utils.os_env_config import get_load_images_timeout
 from ocrrouter.utils.enum_class import ImageType
 from ocrrouter.utils.hash_utils import str_sha256
-from .pdf_reader import image_to_b64str, image_to_bytes, page_to_image
-from .pdf_page_id import get_end_page_id
+from ocrrouter.utils.io.writers import FileBasedDataWriter
+from ocrrouter.utils.os_env_config import get_load_images_timeout
 
-from concurrent.futures import ProcessPoolExecutor, TimeoutError as FuturesTimeoutError
+from .pdf_page_id import get_end_page_id
+from .pdf_reader import image_to_b64str, image_to_bytes, page_to_image
 
 
 def pdf_page_to_image(page: pdfium.PdfPage, dpi=200, image_type=ImageType.PIL) -> dict:

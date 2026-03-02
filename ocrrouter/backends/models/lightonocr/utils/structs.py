@@ -4,7 +4,6 @@ import re
 
 from ocrrouter.backends.utils import BlockType
 
-
 # Regex pattern for parsing image bboxes in LightOnOCR output
 # Format: ![image](image_N.png) x1,y1,x2,y2
 # Where coordinates are normalized to 0-1000

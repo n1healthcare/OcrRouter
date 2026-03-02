@@ -4,10 +4,9 @@ import json
 import os
 from typing import Literal
 
-from loguru import logger
-
 from ocrrouter.config import Settings
 from ocrrouter.utils.io.writers import FileBasedDataWriter
+
 from .utils.draw_bbox import draw_layout_bbox
 
 

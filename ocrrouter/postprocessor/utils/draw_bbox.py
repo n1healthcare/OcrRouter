@@ -2,7 +2,7 @@ import json
 from io import BytesIO
 
 from loguru import logger
-from pypdf import PdfReader, PdfWriter, PageObject
+from pypdf import PageObject, PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 
 from ocrrouter.utils.enum_class import BlockType, ContentType, SplitFlag
@@ -20,25 +20,25 @@ def cal_canvas_rect(page, bbox):
         rect: [x0, y0, width, height] representing the rectangle coordinates on the canvas.
     """
     page_width, page_height = float(page.cropbox[2]), float(page.cropbox[3])
-    
+
     actual_width = page_width    # The width of the final PDF display
     actual_height = page_height  # The height of the final PDF display
-    
+
     rotation_obj = page.get("/Rotate", 0)
     try:
         rotation = int(rotation_obj) % 360  # cast rotation to int to handle IndirectObject
     except (ValueError, TypeError) as e:
         logger.warning(f"Invalid /Rotate value {rotation_obj!r} on page; defaulting to 0. Error: {e}")
         rotation = 0
-    
+
     if rotation in [90, 270]:
         # PDF is rotated 90 degrees or 270 degrees, and the width and height need to be swapped
         actual_width, actual_height = actual_height, actual_width
-        
+
     x0, y0, x1, y1 = bbox
     rect_w = abs(x1 - x0)
     rect_h = abs(y1 - y0)
-    
+
     if rotation == 270:
         rect_w, rect_h = rect_h, rect_w
         x0 = actual_height - y1
@@ -48,12 +48,12 @@ def cal_canvas_rect(page, bbox):
         # y0 stays the same
     elif rotation == 90:
         rect_w, rect_h = rect_h, rect_w
-        x0, y0 = y0, x0 
+        x0, y0 = y0, x0
     else:
         # rotation == 0
         y0 = page_height - y1
-    
-    rect = [x0, y0, rect_w, rect_h]        
+
+    rect = [x0, y0, rect_w, rect_h]
     return rect
 
 
@@ -62,7 +62,7 @@ def draw_bbox_without_number(i, bbox_list, page, c, rgb_config, fill_config):
     page_data = bbox_list[i]
 
     for bbox in page_data:
-        rect = cal_canvas_rect(page, bbox)  # Define the rectangle  
+        rect = cal_canvas_rect(page, bbox)  # Define the rectangle
 
         if fill_config:  # filled rectangle
             c.setFillColorRGB(new_rgb[0], new_rgb[1], new_rgb[2], 0.3)
@@ -81,8 +81,8 @@ def draw_bbox_with_number(i, bbox_list, page, c, rgb_config, fill_config, draw_b
 
     for j, bbox in enumerate(page_data):
         # 确保bbox的每个元素都是float
-        rect = cal_canvas_rect(page, bbox)  # Define the rectangle  
-        
+        rect = cal_canvas_rect(page, bbox)  # Define the rectangle
+
         if draw_bbox:
             if fill_config:
                 c.setFillColorRGB(*new_rgb, 0.3)
@@ -92,7 +92,7 @@ def draw_bbox_with_number(i, bbox_list, page, c, rgb_config, fill_config, draw_b
                 c.rect(rect[0], rect[1], rect[2], rect[3], stroke=1, fill=0)
         c.setFillColorRGB(*new_rgb, 1.0)
         c.setFontSize(size=10)
-        
+
         c.saveState()
         rotation_obj = page.get("/Rotate", 0)
         try:
@@ -109,7 +109,7 @@ def draw_bbox_with_number(i, bbox_list, page, c, rgb_config, fill_config, draw_b
             c.translate(rect[0] - 2, rect[1] + 10)
         elif rotation == 270:
             c.translate(rect[0] + rect[2] - 10, rect[1] - 2)
-            
+
         c.rotate(rotation)
         c.drawString(0, 0, str(j + 1))
         c.restoreState()
@@ -482,7 +482,7 @@ if __name__ == "__main__":
     # 从json文件读取pdf_info
 
     json_path = "examples/demo1_1746005777.0863056_middle.json"
-    with open(json_path, "r", encoding="utf-8") as f:
+    with open(json_path, encoding="utf-8") as f:
         pdf_ann = json.load(f)
     pdf_info = pdf_ann["pdf_info"]
     # 调用可视化函数,输出到examples目录

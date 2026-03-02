@@ -8,11 +8,13 @@ Handles:
 - Converting to ContentBlock format
 """
 
-import numpy as np
 from typing import Any
+
+import numpy as np
 
 from ocrrouter.backends.models.base import BasePostprocessor
 from ocrrouter.backends.utils import ContentBlock
+
 from .utils import (
     DEFAULT_ID2LABEL,
     DEFAULT_LABEL_TASK_MAPPING,
@@ -291,7 +293,6 @@ class PPDocLayoutPostprocessor(BasePostprocessor):
         Returns:
             List of ContentBlock objects with normalized bboxes
         """
-        import torch
 
         if not output or "scores" not in output:
             return []

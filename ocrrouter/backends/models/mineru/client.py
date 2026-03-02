@@ -1,20 +1,21 @@
 import asyncio
+from collections.abc import Sequence
 from concurrent.futures import Executor
-from typing import Sequence
 
 from PIL import Image
 
-from ocrrouter.config import Settings
-from ocrrouter.observability import get_langfuse_client
-from .preprocessor import MinerUPreprocessor
-from .postprocessor import MinerUPostprocessor
 from ocrrouter.backends.utils import (
     DEFAULT_SYSTEM_PROMPT,
-    SamplingParams,
-    new_vlm_client,
-    gather_tasks,
     ContentBlock,
+    SamplingParams,
+    gather_tasks,
+    new_vlm_client,
 )
+from ocrrouter.config import Settings
+from ocrrouter.observability import get_langfuse_client
+
+from .postprocessor import MinerUPostprocessor
+from .preprocessor import MinerUPreprocessor
 
 
 class MinerUSamplingParams(SamplingParams):

@@ -5,7 +5,6 @@ from pathlib import Path
 from .utils.guess_suffix_or_lang import guess_suffix_by_bytes
 from .utils.pdf_image_tools import images_bytes_to_pdf_bytes
 
-
 PDF_SUFFIXES = ["pdf"]
 IMAGE_SUFFIXES = ["png", "jpeg", "jp2", "webp", "gif", "bmp", "jpg", "tiff"]
 

@@ -1,6 +1,7 @@
 """Backend factory for document processing."""
 
 from ocrrouter.config import Settings
+
 from .models.base import BaseModelBackend
 
 

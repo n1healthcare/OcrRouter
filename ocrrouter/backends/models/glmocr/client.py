@@ -1,22 +1,22 @@
 """GLM-OCR client for VLM inference."""
 
 import asyncio
+from collections.abc import Sequence
 from concurrent.futures import Executor
-from typing import Literal, Sequence
+from typing import Literal
 
 from PIL import Image
 
-from ocrrouter.config import Settings
-from ocrrouter.observability import get_langfuse_client
-from .preprocessor import GlmOCRPreprocessor
-from .postprocessor import GlmOCRPostprocessor
 from ocrrouter.backends.utils import (
     SamplingParams,
-    new_vlm_client,
     gather_tasks,
-    get_png_bytes,
-    get_rgb_image,
+    new_vlm_client,
 )
+from ocrrouter.config import Settings
+from ocrrouter.observability import get_langfuse_client
+
+from .postprocessor import GlmOCRPostprocessor
+from .preprocessor import GlmOCRPreprocessor
 
 
 class GlmOCRSamplingParams(SamplingParams):

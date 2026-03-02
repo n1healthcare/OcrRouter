@@ -15,6 +15,7 @@ Run:
 
 import os
 from pathlib import Path
+
 from ocrrouter import DocumentPipeline, Settings
 
 
@@ -89,12 +90,12 @@ def main():
 
         print(f"\nOutput directory: {result['output_dir']}")
 
-        print(f"\nGenerated files:")
+        print("\nGenerated files:")
         output_path = Path(result['output_dir'])
         for file in sorted(output_path.glob("*")):
             print(f"  - {file.name}")
 
-        print(f"\nMarkdown preview (first 500 characters):")
+        print("\nMarkdown preview (first 500 characters):")
         print("-" * 50)
         markdown = result["markdown"]
         print(markdown[:500])
@@ -104,16 +105,16 @@ def main():
         print(f"\n\nPages processed: {len(result.get('middle_json', []))}")
         print(f"Content blocks: {len(result.get('content_list', []))}")
 
-        print(f"\nTo view the full markdown:")
+        print("\nTo view the full markdown:")
         print(f"  cat {output_path / Path(input_pdf).stem}.md")
 
     except Exception as e:
-        print(f"\nERROR: Processing failed!")
+        print("\nERROR: Processing failed!")
         print(f"  {type(e).__name__}: {e}")
-        print(f"\nPlease check:")
-        print(f"  - API credentials are correct")
-        print(f"  - VLM server is accessible")
-        print(f"  - PDF file is not corrupted")
+        print("\nPlease check:")
+        print("  - API credentials are correct")
+        print("  - VLM server is accessible")
+        print("  - PDF file is not corrupted")
         return
 
     print("\n" + "=" * 50)

@@ -1,0 +1,48 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "latest"
+        enable-cache: true
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras
+    
+    - name: Run Ruff linter
+      run: |
+        uv run ruff check . --output-format=github
+    
+    - name: Run Ruff formatter check
+      run: |
+        uv run ruff format --check .
+    
+    - name: Run mypy type checker
+      run: |
+        uv run mypy ocrrouter --ignore-missing-imports
+      continue-on-error: true  # Don't fail the build on type errors initially
+    
+    - name: Check Python version
+      run: |
+        uv run python --version
+        uv run python -c "import sys; assert sys.version_info >= (3, 13), 'Python 3.13+ required'"

@@ -11,10 +11,9 @@ from pathlib import Path
 from loguru import logger
 
 from ocrrouter import DocumentPipeline, Settings
+from ocrrouter.backends.utils.image_utils import gather_tasks
 from ocrrouter.observability import generate_session_id
 from ocrrouter.preprocessor.utils import guess_suffix_by_path
-from ocrrouter.backends.utils.image_utils import gather_tasks
-
 
 # Supported file formats
 PDF_SUFFIXES = ["pdf"]

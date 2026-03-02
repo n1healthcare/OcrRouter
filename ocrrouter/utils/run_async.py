@@ -1,7 +1,8 @@
 import asyncio
 import threading
+from collections.abc import AsyncIterable, Coroutine, Iterable
 from queue import Queue
-from typing import Any, AsyncIterable, Coroutine, Iterable, TypeVar
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 
@@ -19,7 +20,7 @@ def run_async(coroutine: Coroutine[Any, Any, T]) -> T:
         ValueError: If the argument is not a coroutine.
     """
     if not asyncio.iscoroutine(coroutine):
-        raise ValueError("a coroutine was expected, got {!r}".format(coroutine))
+        raise ValueError(f"a coroutine was expected, got {coroutine!r}")
 
     try:
         loop = asyncio.get_running_loop()
@@ -56,7 +57,7 @@ def run_async(coroutine: Coroutine[Any, Any, T]) -> T:
 
 def iter_async(iterable: AsyncIterable[T]) -> Iterable[T]:
     if not isinstance(iterable, AsyncIterable):
-        raise ValueError("an async iterable was expected, got {!r}".format(iterable))
+        raise ValueError(f"an async iterable was expected, got {iterable!r}")
 
     queue = Queue()
 

@@ -9,19 +9,20 @@ This module provides:
 
 import asyncio
 import json
+from collections.abc import AsyncIterable, Sequence
 from dataclasses import dataclass
-from typing import AsyncIterable, Literal, Sequence
+from typing import Literal
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-from PIL import Image
 from loguru import logger
+from PIL import Image
 
 from ocrrouter.observability import get_langfuse_handler
-from .api_retry import api_retry
-from .image_utils import aio_load_resource, get_image_data_url, get_png_bytes
-from .debug_storage import save_failed_request, cleanup_old_debug_files
 
+from .api_retry import api_retry
+from .debug_storage import save_failed_request
+from .image_utils import aio_load_resource, get_image_data_url, get_png_bytes
 
 DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant."
 DEFAULT_USER_PROMPT = "What is the text in the illustrate?"

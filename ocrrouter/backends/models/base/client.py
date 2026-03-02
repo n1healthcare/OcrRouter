@@ -6,9 +6,8 @@ from typing import TypeVar
 
 from loguru import logger
 
-from ocrrouter.config import Settings
 from ocrrouter.backends.utils import HttpVlmClient
-
+from ocrrouter.config import Settings
 
 ClientT = TypeVar("ClientT", bound="BaseModelClient")
 

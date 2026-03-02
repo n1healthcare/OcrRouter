@@ -1,18 +1,19 @@
 """Composite client for mix-and-match layout detection and OCR."""
 
 import asyncio
+from collections.abc import Sequence
 from concurrent.futures import Executor
-from typing import Literal, Sequence
+from typing import Literal
 
 from PIL import Image
 
-from ocrrouter.config import Settings
-from ocrrouter.observability import get_langfuse_client
 from ocrrouter.backends.utils import (
     ContentBlock,
     gather_tasks,
     get_rgb_image,
 )
+from ocrrouter.config import Settings
+from ocrrouter.observability import get_langfuse_client
 
 
 class CompositeClient:

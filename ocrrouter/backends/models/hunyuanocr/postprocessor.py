@@ -9,7 +9,6 @@ from PIL import Image
 from ocrrouter.backends.models.base import BasePostprocessor
 from ocrrouter.backends.utils import ContentBlock
 
-
 # Coordinate pattern: (x1,y1),(x2,y2) where coordinates are 0-1000
 COORD_PATTERN = re.compile(r"\((\d+),(\d+)\),\((\d+),(\d+)\)")
 

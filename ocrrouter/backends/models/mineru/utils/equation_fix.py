@@ -6,14 +6,14 @@ Re-exports from the existing post_process module for backward compatibility.
 
 # Re-export from the existing post_process module
 from ocrrouter.backends.models.mineru.post_process import (
-    try_fix_unbalanced_braces,
-    try_fix_equation_double_subscript,
-    try_fix_equation_eqqcolon,
-    try_fix_equation_big,
-    try_fix_equation_leq,
-    try_match_equation_left_right,
     convert_otsl_to_html,
     do_handle_equation_block,
+    try_fix_equation_big,
+    try_fix_equation_double_subscript,
+    try_fix_equation_eqqcolon,
+    try_fix_equation_leq,
+    try_fix_unbalanced_braces,
+    try_match_equation_left_right,
 )
 
 

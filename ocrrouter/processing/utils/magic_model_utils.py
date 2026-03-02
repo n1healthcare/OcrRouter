@@ -1,11 +1,13 @@
 """
 包含两个MagicModel类中重复使用的方法和逻辑
 """
-from typing import List, Dict, Any, Callable
+from collections.abc import Callable
+from typing import Any
+
 from .boxbase import bbox_distance, is_in
 
 
-def reduct_overlap(bboxes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def reduct_overlap(bboxes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     去除重叠的bbox，保留不被其他bbox包含的bbox
 
@@ -67,7 +69,7 @@ def tie_up_category_by_distance_v3(
     seen_idx = set()
     seen_sub_idx = set()
 
-    while N > len(seen_sub_idx):
+    while len(seen_sub_idx) < N:
         candidates = []
         for idx, kind, x0, y0 in all_boxes_with_idx:
             if idx in seen_idx:

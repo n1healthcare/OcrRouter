@@ -22,14 +22,14 @@ from .factory import get_backend
 from .models.base import (
     BaseModelBackend,
     BaseModelClient,
-    BasePreprocessor,
     BasePostprocessor,
+    BasePreprocessor,
 )
 
 # Re-export common utilities
 from .utils import (
-    BlockType,
     BLOCK_TYPES,
+    BlockType,
     ContentBlock,
     SamplingParams,
     result_to_middle_json,

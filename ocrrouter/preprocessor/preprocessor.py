@@ -2,10 +2,11 @@
 
 import io
 
-from loguru import logger
 import pypdfium2 as pdfium
+from loguru import logger
 
 from ocrrouter.config import Settings
+
 from .utils.pdf_page_id import get_end_page_id
 
 

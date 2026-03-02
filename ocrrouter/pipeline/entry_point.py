@@ -3,6 +3,7 @@
 from typing import Any
 
 from ocrrouter.config import Settings
+
 from .pipeline import DocumentPipeline
 
 

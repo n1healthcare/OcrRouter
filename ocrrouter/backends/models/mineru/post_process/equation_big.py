@@ -478,7 +478,7 @@ def try_fix_equation_big(latex: str, debug: bool = False) -> str:
 
     # \bigtimes -> \times
     latex = re.sub(r"\\bigtimes", r"\\times", latex)
-    
+
     if debug and original_latex != latex:
         print(f"Fixed equation big from: {original_latex} to: {latex}")
 

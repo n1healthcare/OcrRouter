@@ -9,12 +9,11 @@ Both formats use bbox range 0-999 (normalized to 0-1 during parsing).
 
 import ast
 import re
-from typing import Any
 
 from ocrrouter.backends.models.base import BasePostprocessor
-from ocrrouter.backends.utils import ContentBlock, BLOCK_TYPES
-from .utils.structs import map_deepseek_label
+from ocrrouter.backends.utils import BLOCK_TYPES, ContentBlock
 
+from .utils.structs import map_deepseek_label
 
 # DeepSeek v1 grounding format regex
 # Format: <|ref|>label<|/ref|><|det|>[[x1, y1, x2, y2]]<|/det|>content

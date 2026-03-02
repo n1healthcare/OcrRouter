@@ -5,22 +5,22 @@ for detecting document regions (text, tables, images, formulas, etc.).
 """
 
 import asyncio
+from collections.abc import Sequence
 from concurrent.futures import Executor, ThreadPoolExecutor
-from typing import Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-import numpy as np
-from PIL import Image
 from loguru import logger
+from PIL import Image
 
 if TYPE_CHECKING:
     import torch
 
+from ocrrouter.backends.utils import ContentBlock, gather_tasks
 from ocrrouter.config import Settings
 from ocrrouter.observability import get_langfuse_client
-from ocrrouter.backends.utils import ContentBlock, gather_tasks
 
-from .preprocessor import PPDocLayoutPreprocessor
 from .postprocessor import PPDocLayoutPostprocessor
+from .preprocessor import PPDocLayoutPreprocessor
 from .utils import DEFAULT_ID2LABEL, DEFAULT_THRESHOLD
 
 
@@ -160,9 +160,10 @@ class PPDocLayoutClient:
         # Strategy 2: Try loading via huggingface_hub dynamic import
         if not model_loaded:
             try:
-                from huggingface_hub import hf_hub_download
                 import importlib.util
                 import sys
+
+                from huggingface_hub import hf_hub_download
 
                 # Download and import the model's custom code
                 model_file = hf_hub_download(
@@ -191,8 +192,8 @@ class PPDocLayoutClient:
                 processor_module = load_module("image_processing_ppdoclayoutv3", processor_file)
 
                 # Get the classes
-                ModelClass = getattr(model_module, "PPDocLayoutV3ForObjectDetection")
-                ProcessorClass = getattr(processor_module, "PPDocLayoutV3ImageProcessorFast")
+                ModelClass = model_module.PPDocLayoutV3ForObjectDetection
+                ProcessorClass = processor_module.PPDocLayoutV3ImageProcessorFast
 
                 self._image_processor = ProcessorClass.from_pretrained(self.model_dir)
                 self._model = ModelClass.from_pretrained(self.model_dir)

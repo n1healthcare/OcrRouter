@@ -72,27 +72,43 @@ git clone https://github.com/YOUR_USERNAME/ocrrouter.git
 cd ocrrouter
 ```
 
-### 2. Create Virtual Environment
+### 2. Install Python 3.13
+
+This project requires **Python 3.13** or later.
 
 ```bash
-# Using venv
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Using uv (recommended)
+uv python install 3.13
 
-# Or using conda
-conda create -n ocrrouter python=3.11
-conda activate ocrrouter
+# Or download from python.org
+# https://www.python.org/downloads/
 ```
 
 ### 3. Install Development Dependencies
 
+We use **uv** for fast, reliable dependency management:
+
 ```bash
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies with uv
+uv sync --all-extras
+
+# This will:
+# - Install Python 3.13 if needed
+# - Create a virtual environment
+# - Install all dependencies including dev tools
+```
+
+**Alternative using pip:**
+```bash
+# Create virtual environment
+python3.13 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 # Install in editable mode with dev dependencies
 pip install -e ".[dev]"
-
-# If dev extras not defined, install manually:
-pip install -e .
-pip install pytest black ruff mypy
 ```
 
 ### 4. Set Up Pre-commit Hooks (Optional)
@@ -141,17 +157,40 @@ Branch naming conventions:
 ### 3. Test Your Changes
 
 ```bash
-# Run tests
-pytest
+# Using uv (recommended)
+uv run pytest                      # Run tests
+uv run ruff check .                # Run linter
+uv run ruff format --check .       # Check formatting
+uv run mypy ocrrouter              # Run type checker
 
-# Run linter
-ruff check .
+# Or with activated virtual environment
+source .venv/bin/activate
+pytest                             # Run tests
+ruff check .                       # Run linter
+ruff format .                      # Format code (auto-fix)
+mypy ocrrouter                     # Run type checker
+```
 
-# Run type checker
-mypy ocrrouter
+**Linting Configuration:**
+
+The project uses Ruff for linting and formatting. Configuration is in `pyproject.toml`:
+- Line length: 120 characters
+- Target: Python 3.13
+- Auto-fixes available for many issues
+
+**Common linting commands:**
+```bash
+# Check for issues
+uv run ruff check .
+
+# Auto-fix issues
+uv run ruff check --fix .
 
 # Format code
-black ocrrouter
+uv run ruff format .
+
+# Check formatting without changes
+uv run ruff format --check .
 ```
 
 ### 4. Commit Your Changes

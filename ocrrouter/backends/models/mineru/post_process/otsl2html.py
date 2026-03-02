@@ -1,7 +1,7 @@
 import html
 import itertools
 import re
-from typing import Any, Dict, List
+from typing import Any
 
 from pydantic import BaseModel, computed_field, model_validator
 
@@ -21,7 +21,7 @@ class TableCell(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def from_dict_format(cls, data: Any) -> Any:
-        if isinstance(data, Dict):
+        if isinstance(data, dict):
             # Check if this is a native BoundingBox or a bbox from docling-ibm-models
             if (
                 # "bbox" not in data
@@ -45,13 +45,13 @@ class TableCell(BaseModel):
 
 
 class TableData(BaseModel):  # TBD
-    table_cells: List[TableCell] = []
+    table_cells: list[TableCell] = []
     num_rows: int = 0
     num_cols: int = 0
 
     @computed_field
     @property
-    def grid(self) -> List[List[TableCell]]:
+    def grid(self) -> list[list[TableCell]]:
         # Initialise empty table data grid (only empty cells)
         table_data = [
             [

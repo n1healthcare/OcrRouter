@@ -5,8 +5,8 @@ from typing import Any
 
 from PIL import Image
 
-from ocrrouter.utils.io.writers import DataWriter
 from ocrrouter.backends.utils import ContentBlock
+from ocrrouter.utils.io.writers import DataWriter
 
 
 class BaseModelBackend(ABC):

@@ -1,12 +1,10 @@
 """Post-processing for document processing pipeline."""
 
-import json
 from typing import Literal
 
 from ocrrouter.config import Settings
-from ocrrouter.utils.enum_class import MakeMode
-
 from ocrrouter.postprocessor.utils.markdown import union_make
+from ocrrouter.utils.enum_class import MakeMode
 
 
 class Postprocessor:

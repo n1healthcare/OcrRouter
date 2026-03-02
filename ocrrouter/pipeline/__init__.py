@@ -1,7 +1,7 @@
 """Pipeline module for document processing."""
 
-from .pipeline import DocumentPipeline
 from .entry_point import process_document
+from .pipeline import DocumentPipeline
 
 __all__ = [
     "DocumentPipeline",

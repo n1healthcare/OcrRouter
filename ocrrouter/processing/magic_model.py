@@ -3,8 +3,9 @@ from typing import Literal
 
 from loguru import logger
 
-from ocrrouter.utils.enum_class import ContentType, BlockType
 from ocrrouter.preprocessor.utils.guess_suffix_or_lang import guess_language_by_text
+from ocrrouter.utils.enum_class import BlockType, ContentType
+
 from .utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio
 from .utils.magic_model_utils import (
     reduct_overlap,

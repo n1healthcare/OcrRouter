@@ -1,9 +1,7 @@
-from loguru import logger
 from bs4 import BeautifulSoup
 
 from ocrrouter.postprocessor.utils.markdown import merge_para_with_text
 from ocrrouter.utils.enum_class import BlockType, SplitFlag
-
 
 CONTINUATION_MARKERS = ["(续)", "(续表)", "(continued)", "(cont.)"]
 

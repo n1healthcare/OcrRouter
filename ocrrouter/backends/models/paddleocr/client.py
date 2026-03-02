@@ -1,23 +1,23 @@
 """PaddleOCR client for VLM inference."""
 
 import asyncio
+from collections.abc import Sequence
 from concurrent.futures import Executor
-from typing import Literal, Sequence
+from typing import Literal
 
 from PIL import Image
 
-from ocrrouter.config import Settings
-from ocrrouter.observability import get_langfuse_client
-from .preprocessor import PaddleOCRPreprocessor
-from .postprocessor import PaddleOCRPostprocessor
 from ocrrouter.backends.utils import (
     ContentBlock,
     SamplingParams,
-    new_vlm_client,
     gather_tasks,
-    get_png_bytes,
-    get_rgb_image,
+    new_vlm_client,
 )
+from ocrrouter.config import Settings
+from ocrrouter.observability import get_langfuse_client
+
+from .postprocessor import PaddleOCRPostprocessor
+from .preprocessor import PaddleOCRPreprocessor
 
 
 class PaddleOCRSamplingParams(SamplingParams):

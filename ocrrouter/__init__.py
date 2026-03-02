@@ -53,16 +53,15 @@ Example usage (Direct backend access):
     ```
 """
 
-from .version import __version__
-
-# Core Pipeline API
-from .pipeline import DocumentPipeline, process_document
-
 # Backend factory
 from .backends import get_backend
 
 # Configuration
 from .config import Settings
+
+# Core Pipeline API
+from .pipeline import DocumentPipeline, process_document
+from .version import __version__
 
 __all__ = [
     # Version

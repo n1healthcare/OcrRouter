@@ -1,5 +1,6 @@
 from loguru import logger
-from ocrrouter.utils.enum_class import MakeMode, BlockType, ContentType, ContentTypeV2
+
+from ocrrouter.utils.enum_class import BlockType, ContentType, ContentTypeV2, MakeMode
 
 # LaTeX delimiter constants (hardcoded)
 DISPLAY_LEFT_DELIMITER = "$$"

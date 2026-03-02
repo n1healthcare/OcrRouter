@@ -7,6 +7,7 @@ from typing import Any
 
 from ocrrouter.backends.models.base import BasePostprocessor
 from ocrrouter.backends.utils import BLOCK_TYPES, ContentBlock
+
 from .utils import map_dotsocr_label
 
 

@@ -38,10 +38,11 @@ Example:
 import asyncio
 import logging
 import random
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, Optional, Set, TypeVar, Union
-import loguru
+from typing import TypeVar
 
+import loguru
 from tenacity import (
     after_log,
     before_sleep_log,
@@ -54,8 +55,8 @@ from tenacity.wait import wait_base
 T = TypeVar("T")
 
 # Default status codes
-DEFAULT_NO_RETRY_STATUS_CODES: Set[int] = {400, 401, 403, 422}
-DEFAULT_RETRY_STATUS_CODES: Set[int] = {429, 500, 502, 503, 504}
+DEFAULT_NO_RETRY_STATUS_CODES: set[int] = {400, 401, 403, 422}
+DEFAULT_RETRY_STATUS_CODES: set[int] = {429, 500, 502, 503, 504}
 
 # Default retry parameters
 DEFAULT_MAX_RETRIES = 3
@@ -89,10 +90,10 @@ class wait_exponential_full_jitter(wait_base):
 
     def __init__(
         self,
-        min_base: Union[int, float] = DEFAULT_MIN_BASE,
-        max_base: Union[int, float] = DEFAULT_MAX_BASE,
-        exp_base: Union[int, float] = 2,
-        cap: Optional[Union[int, float]] = None,
+        min_base: int | float = DEFAULT_MIN_BASE,
+        max_base: int | float = DEFAULT_MAX_BASE,
+        exp_base: int | float = 2,
+        cap: int | float | None = None,
     ) -> None:
         self.min_base = min_base
         self.max_base = max_base
@@ -118,8 +119,8 @@ class wait_exponential_full_jitter(wait_base):
 
 
 def _create_should_retry_exception(
-    no_retry_status_codes: Set[int],
-    retry_status_codes: Set[int],
+    no_retry_status_codes: set[int],
+    retry_status_codes: set[int],
 ) -> Callable[[BaseException], bool]:
     """
     Create a retry exception checker with configurable status codes.
@@ -171,10 +172,10 @@ def api_retry(
     max_retries: int = DEFAULT_MAX_RETRIES,
     min_base: float = DEFAULT_MIN_BASE,
     max_base: float = DEFAULT_MAX_BASE,
-    no_retry_status_codes: Optional[Set[int]] = None,
-    retry_status_codes: Optional[Set[int]] = None,
-    cap: Optional[float] = None,
-    logger: Optional[Union[logging.Logger, loguru.logger]] = None,
+    no_retry_status_codes: set[int] | None = None,
+    retry_status_codes: set[int] | None = None,
+    cap: float | None = None,
+    logger: logging.Logger | loguru.logger | None = None,
     reraise: bool = False,
 ) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """

@@ -5,7 +5,6 @@ from PIL import Image
 from ocrrouter.backends.models.base import BasePreprocessor
 from ocrrouter.backends.utils import ContentBlock, get_png_bytes, get_rgb_image
 
-
 # LightOnOCR recommended input: 1540px longest dimension
 MAX_DIMENSION = 1540
 

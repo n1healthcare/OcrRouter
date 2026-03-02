@@ -1,7 +1,7 @@
 """Post-processing stage for document output."""
 
-from .postprocessor import Postprocessor
 from .output_handler import OutputHandler
+from .postprocessor import Postprocessor
 
 __all__ = [
     "Postprocessor",

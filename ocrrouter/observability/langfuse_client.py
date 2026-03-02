@@ -6,16 +6,15 @@ DocumentPipeline via the `langfuse` parameter.
 """
 
 import uuid
-from typing import Optional, Any
+from typing import Any
 
 from loguru import logger
 
-
 # Module-level client storage
-_langfuse_client: Optional[Any] = None
+_langfuse_client: Any | None = None
 
 
-def get_langfuse_client() -> Optional[Any]:
+def get_langfuse_client() -> Any | None:
     """Get the currently configured Langfuse client.
 
     Returns None if no Langfuse client has been set.
@@ -26,7 +25,7 @@ def get_langfuse_client() -> Optional[Any]:
     return _langfuse_client
 
 
-def set_langfuse_client(client: Optional[Any]) -> None:
+def set_langfuse_client(client: Any | None) -> None:
     """Set the Langfuse client for observability.
 
     This is called internally by DocumentPipeline when a langfuse client
@@ -41,7 +40,7 @@ def set_langfuse_client(client: Optional[Any]) -> None:
         logger.debug("Langfuse client set")
 
 
-def get_langfuse_handler() -> Optional[Any]:
+def get_langfuse_handler() -> Any | None:
     """Get Langfuse CallbackHandler for LangChain integration.
 
     Creates a new CallbackHandler instance each time it's called.
@@ -63,7 +62,7 @@ def get_langfuse_handler() -> Optional[Any]:
         return None
 
 
-def generate_session_id(name: Optional[str] = None, prefix: str = "ocrRouter") -> str:
+def generate_session_id(name: str | None = None, prefix: str = "ocrRouter") -> str:
     """Generate a session ID for grouping traces.
 
     Args:
